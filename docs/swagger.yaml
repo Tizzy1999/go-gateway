@@ -30,7 +30,6 @@ definitions:
     type: object
 info:
   contact: {}
-  license: {}
 paths:
   /demo/bind:
     post:

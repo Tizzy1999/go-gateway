@@ -1,14 +1,15 @@
 package router
 
 import (
-	"github.com/e421083458/gin_scaffold/controller"
-	"github.com/e421083458/gin_scaffold/middleware"
 	"github.com/e421083458/golang_common/lib"
 	"github.com/gin-gonic/contrib/sessions"
 	"github.com/gin-gonic/gin"
-	"github.com/e421083458/gin_scaffold/docs"
 	"github.com/swaggo/files"
 	"github.com/swaggo/gin-swagger"
+	"go_gateway_demo/controller"
+	"go_gateway_demo/docs"
+	"go_gateway_demo/middleware"
+	"log"
 )
 
 // @title Swagger Example API
@@ -74,34 +75,21 @@ func InitRouter(middlewares ...gin.HandlerFunc) *gin.Engine {
 	})
 	router.GET("/swagger/*any", ginSwagger.WrapHandler(swaggerFiles.Handler))
 
-	//demo
-	v1 := router.Group("/demo")
-	v1.Use(middleware.RecoveryMiddleware(), middleware.RequestLog(), middleware.IPAuthMiddleware(), middleware.TranslationMiddleware())
-	{
-		controller.DemoRegister(v1)
+	// admin_login的路由注册，将group注册到router，管理员登陆，用redis保存cookie
+	adminLoginRouter := router.Group("/admin_login")
+	// 设置router中间件，分布式持久化-redis
+	store, err := sessions.NewRedisStore(10, "tcp", "localhost:6379", "", []byte("secret"))
+	if err != nil {
+		log.Fatalf("sessions.NewRedisStore err:%v", err)
 	}
-
-	//非登陆接口
-	store := sessions.NewCookieStore([]byte("secret"))
-	apiNormalGroup := router.Group("/api")
-	apiNormalGroup.Use(sessions.Sessions("mysession", store),
-		middleware.RecoveryMiddleware(),
-		middleware.RequestLog(),
-		middleware.TranslationMiddleware())
-	{
-		controller.ApiRegister(apiNormalGroup)
-	}
-
-	//登陆接口
-	apiAuthGroup := router.Group("/api")
-	apiAuthGroup.Use(
+	adminLoginRouter.Use(
 		sessions.Sessions("mysession", store),
 		middleware.RecoveryMiddleware(),
 		middleware.RequestLog(),
-		middleware.SessionAuthMiddleware(),
 		middleware.TranslationMiddleware())
 	{
-		controller.ApiLoginRegister(apiAuthGroup)
+		// 子group的注册
+		controller.AdminLoginRegister(adminLoginRouter)
 	}
 	return router
 }
