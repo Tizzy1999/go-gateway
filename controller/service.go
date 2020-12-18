@@ -1,7 +1,9 @@
 package controller
 
 import (
+	"github.com/e421083458/golang_common/lib"
 	"github.com/gin-gonic/gin"
+	"go_gateway_demo/dao"
 	"go_gateway_demo/dto"
 	"go_gateway_demo/middleware"
 )
@@ -31,17 +33,33 @@ func (service *ServiceController) ServiceList(c *gin.Context) {
 	params := &dto.ServiceListInput{}
 	if err := params.BindValidParam(c); err != nil {
 		middleware.ResponseError(c, 2000, err)
+		return
 	}
-	// 1. 读取sessionKey对应json转换为结构体
-	// 2. 取出数据然后封装输出结构体
-	//ID          int64  `json:"id" form:"id"`                     //id
-	//ServiceName string `json:"service_name" form:"service_name"` //服务名称
-	//ServiceDesc string `json:"service_desc" form:"service_desc"` //服务描述
-	//LoadType    int    `json:"load_type" form:"load_type"`       //类型
-	//ServiceAddr string `json:"service_addr" form:"service_addr"` //服务地址
-	//Qps         int64  `json:"qps" form:"qps"`                   //qps
-	//Qpd         int64  `json:"qpd" form:"qpd"`                   //qpd
-	//TotalNode   int    `json:"total_node" form:"total_node"`     //节点数
-	out := &dto.ServiceListOutput{}
+	tx, err := lib.GetGormPool("default")
+	if err != nil {
+		middleware.ResponseError(c, 2001, err)
+		return
+	}
+	serviceInfo := &dao.ServiceInfo{}
+	list, total, err := serviceInfo.PageList(c, tx, params)
+	if err != nil {
+		middleware.ResponseError(c, 2002, err)
+		return
+	}
+
+	outList := []dto.ServiceListItemOutput{}
+	for _, listItem := range list {
+		outItem := dto.ServiceListItemOutput{
+			ID:          listItem.ID,
+			LoadType:    listItem.LoadType,
+			ServiceName: listItem.ServiceName,
+			ServiceDesc: listItem.ServiceDesc,
+		}
+		outList = append(outList, outItem)
+	}
+	out := &dto.ServiceListOutput{
+		Total: total,
+		List:  outList,
+	}
 	middleware.ResponseSuccess(c, out)
 }
