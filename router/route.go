@@ -104,5 +104,19 @@ func InitRouter(middlewares ...gin.HandlerFunc) *gin.Engine {
 		// 子路由的注册
 		controller.AdminRegister(adminRouter)
 	}
+
+	// service的路由注册
+	serviceRouter := router.Group("/service")
+	serviceRouter.Use(
+		sessions.Sessions("mysession", store),
+		middleware.RecoveryMiddleware(),
+		middleware.RequestLog(),
+		middleware.SessionAuthMiddleware(),
+		middleware.TranslationMiddleware())
+	{
+		// 子路由的注册
+		controller.ServiceRegister(serviceRouter)
+	}
+
 	return router
 }
