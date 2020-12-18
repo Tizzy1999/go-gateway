@@ -91,5 +91,18 @@ func InitRouter(middlewares ...gin.HandlerFunc) *gin.Engine {
 		// 子group的注册
 		controller.AdminLoginRegister(adminLoginRouter)
 	}
+
+	// admin_info的路由注册，将group注册到router
+	adminRouter := router.Group("/admin")
+	adminRouter.Use(
+		sessions.Sessions("mysession", store),
+		middleware.RecoveryMiddleware(),
+		middleware.RequestLog(),
+		middleware.SessionAuthMiddleware(),
+		middleware.TranslationMiddleware())
+	{
+		// 子路由的注册
+		controller.AdminRegister(adminRouter)
+	}
 	return router
 }

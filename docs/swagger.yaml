@@ -1,19 +1,32 @@
 definitions:
-  dto.DemoInput:
+  dto.AdminLoginInput:
     properties:
-      age:
-        example: 20
-        type: integer
-      name:
-        example: 姓名
+      password:
+        example: "123456"
         type: string
-      passwd:
+      username:
+        description: |-
+          gin的tag，json为json标签，form为表单标签
+          管理员用户名 + 密码
+        example: admin
+        type: string
+    required:
+    - password
+    type: object
+  dto.AdminLoginOutput:
+    properties:
+      token:
+        description: 和前端整合的时候需要用token
+        example: token
+        type: string
+    type: object
+  dto.ChangePwdInput:
+    properties:
+      password:
         example: "123456"
         type: string
     required:
-    - age
-    - name
-    - passwd
+    - password
     type: object
   middleware.Response:
     properties:
@@ -31,19 +44,12 @@ definitions:
 info:
   contact: {}
 paths:
-  /demo/bind:
-    post:
+  /admin/admin_info:
+    get:
       consumes:
       - application/json
-      description: 测试数据绑定
-      operationId: /demo/bind
-      parameters:
-      - description: body
-        in: body
-        name: polygon
-        required: true
-        schema:
-          $ref: '#/definitions/dto.DemoInput'
+      description: 管理员信息
+      operationId: /admin/admin_info
       produces:
       - application/json
       responses:
@@ -54,9 +60,86 @@ paths:
             - $ref: '#/definitions/middleware.Response'
             - properties:
                 data:
-                  $ref: '#/definitions/dto.DemoInput'
+                  $ref: '#/definitions/dto.AdminLoginOutput'
               type: object
-      summary: 测试数据绑定
+      summary: 管理员信息
       tags:
-      - 用户
+      - 管理员接口
+  /admin/change_pwd:
+    post:
+      consumes:
+      - application/json
+      description: 修改密码
+      operationId: /admin/change_pwd
+      parameters:
+      - description: body
+        in: body
+        name: polygon
+        required: true
+        schema:
+          $ref: '#/definitions/dto.ChangePwdInput'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: success
+          schema:
+            allOf:
+            - $ref: '#/definitions/middleware.Response'
+            - properties:
+                data:
+                  type: string
+              type: object
+      summary: 修改密码
+      tags:
+      - 管理员接口
+  /admin_login/login:
+    post:
+      consumes:
+      - application/json
+      description: 管理员登陆
+      operationId: /admin_login/login
+      parameters:
+      - description: body
+        in: body
+        name: polygon
+        required: true
+        schema:
+          $ref: '#/definitions/dto.AdminLoginInput'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: success
+          schema:
+            allOf:
+            - $ref: '#/definitions/middleware.Response'
+            - properties:
+                data:
+                  $ref: '#/definitions/dto.AdminLoginOutput'
+              type: object
+      summary: 管理员登陆
+      tags:
+      - 管理员接口
+  /admin_login/logout:
+    get:
+      consumes:
+      - application/json
+      description: 管理员退出
+      operationId: /admin_login/logout
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: success
+          schema:
+            allOf:
+            - $ref: '#/definitions/middleware.Response'
+            - properties:
+                data:
+                  type: string
+              type: object
+      summary: 管理员退出
+      tags:
+      - 管理员接口
 swagger: "2.0"
