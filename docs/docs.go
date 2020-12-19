@@ -399,7 +399,7 @@ var doc = `{
                     "description": "客户端ip限流",
                     "type": "integer"
                 },
-                "header_transfor": {
+                "header_transfer": {
                     "description": "header转换",
                     "type": "string"
                 },

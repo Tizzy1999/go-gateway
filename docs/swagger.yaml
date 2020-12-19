@@ -36,7 +36,7 @@ definitions:
       clientip_flow_limit:
         description: 客户端ip限流
         type: integer
-      header_transfor:
+      header_transfer:
         description: header转换
         type: string
       ip_list:

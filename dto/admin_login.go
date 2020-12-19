@@ -10,7 +10,7 @@ import (
 type AdminLoginInput struct {
 	// gin的tag，json为json标签，form为表单标签
 	// 管理员用户名 + 密码
-	UserName string `json:"username" form:"username" comment:"姓名" example:"admin" validate:"is_valid_username"`
+	UserName string `json:"username" form:"username" comment:"姓名" example:"admin" validate:"valid_username"`
 	Password string `json:"password" form:"password" comment:"密码" example:"123456" validate:"required"`
 }
 

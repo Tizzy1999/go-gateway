@@ -164,5 +164,16 @@ func (service *ServiceController) ServiceAddHTTP(c *gin.Context) {
 		middleware.ResponseError(c, 2000, err)
 		return
 	}
+	tx, err := lib.GetGormPool("default")
+	if err != nil {
+		middleware.ResponseError(c, 2001, err)
+		return
+	}
+	serviceInfo := &dao.ServiceInfo{}
+	serviceInfo, err = serviceInfo.Find(c, tx, serviceInfo)
+	if err != nil {
+		middleware.ResponseError(c, 2002, err)
+		return
+	}
 	middleware.ResponseSuccess(c, "")
 }
