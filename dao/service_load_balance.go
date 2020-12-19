@@ -4,6 +4,7 @@ import (
 	"github.com/e421083458/gorm"
 	"github.com/gin-gonic/gin"
 	"go_gateway_demo/public"
+	"strings"
 )
 
 type LoadBalance struct {
@@ -38,4 +39,8 @@ func (t *LoadBalance) Save(c *gin.Context, tx *gorm.DB) error {
 		return err
 	}
 	return nil
+}
+
+func (t *LoadBalance) GetIPListByModel() []string {
+	return strings.Split(t.IpList, ",")
 }
