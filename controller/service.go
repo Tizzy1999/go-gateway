@@ -18,6 +18,7 @@ func ServiceRegister(group *gin.RouterGroup) {
 	// 请求前缀 + action方法
 	group.GET("/service_list", service.ServiceList)
 	group.GET("/service_delete", service.ServiceDelete)
+	group.POST("/service_add_http", service.ServiceAddHTTP)
 }
 
 // Service godoc
@@ -140,6 +141,27 @@ func (service *ServiceController) ServiceDelete(c *gin.Context) {
 	serviceInfo.IsDelete = 1
 	if err = serviceInfo.Save(c, tx); err != nil {
 		middleware.ResponseError(c, 2003, err)
+		return
+	}
+	middleware.ResponseSuccess(c, "")
+}
+
+// ServiceAddHTTP godoc
+// @Summary 添加HTTP服务
+// @Description 添加HTTP服务
+// @Tags 服务管理
+// @ID /service/service_add_http
+// @Accept  json
+// @Produce  json
+// @Param body body dto.ServiceAddHTTPInput true "body"
+// @Success 200 {object} middleware.Response{data=string} "success"
+// @Router /service/service_add_http [post]
+func (service *ServiceController) ServiceAddHTTP(c *gin.Context) {
+	// 定义接收参数用到的结构体
+	params := &dto.ServiceAddHTTPInput{}
+	// 进行数据绑定，将接收的参数绑定到param中
+	if err := params.BindValidParam(c); err != nil {
+		middleware.ResponseError(c, 2000, err)
 		return
 	}
 	middleware.ResponseSuccess(c, "")
