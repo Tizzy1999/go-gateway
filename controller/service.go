@@ -1,6 +1,7 @@
 package controller
 
 import (
+	"errors"
 	"fmt"
 	"github.com/e421083458/golang_common/lib"
 	"github.com/gin-gonic/gin"
@@ -8,6 +9,7 @@ import (
 	"go_gateway_demo/dto"
 	"go_gateway_demo/middleware"
 	"go_gateway_demo/public"
+	"strings"
 )
 
 type ServiceController struct {
@@ -164,16 +166,83 @@ func (service *ServiceController) ServiceAddHTTP(c *gin.Context) {
 		middleware.ResponseError(c, 2000, err)
 		return
 	}
+	if len(strings.Split(params.IpList, "\n")) != len(strings.Split(params.WeightList, "\n")) {
+		middleware.ResponseError(c, 2004, errors.New("IP列表与权重列表数量不一致"))
+		return
+	}
+
 	tx, err := lib.GetGormPool("default")
 	if err != nil {
 		middleware.ResponseError(c, 2001, err)
 		return
 	}
-	serviceInfo := &dao.ServiceInfo{}
-	serviceInfo, err = serviceInfo.Find(c, tx, serviceInfo)
-	if err != nil {
-		middleware.ResponseError(c, 2002, err)
+	tx = tx.Begin()
+	serviceInfo := &dao.ServiceInfo{ServiceName: params.ServiceName}
+	if _, err = serviceInfo.Find(c, tx, serviceInfo); err == nil {
+		tx.Rollback()
+		middleware.ResponseError(c, 2002, errors.New("服务已存在"))
 		return
 	}
+	httpUrl := &dao.HttpRule{RuleType: params.RuleType, Rule: params.Rule}
+	if _, err := httpUrl.Find(c, tx, httpUrl); err == nil {
+		tx.Rollback()
+		middleware.ResponseError(c, 2002, errors.New("服务接入前缀或域名已存在"))
+		return
+	}
+
+	serviceModel := &dao.ServiceInfo{
+		ServiceName: params.ServiceName,
+		ServiceDesc: params.ServiceDesc,
+	}
+	if err := serviceModel.Save(c, tx); err != nil {
+		tx.Rollback()
+		middleware.ResponseError(c, 2005, err)
+		return
+	}
+	httpRule := &dao.HttpRule{
+		ServiceID:      serviceModel.ID,
+		RuleType:       params.RuleType,
+		Rule:           params.Rule,
+		NeedHttps:      params.NeedHttps,
+		NeedStripUri:   params.NeedStripUri,
+		NeedWebsocket:  params.NeedWebsocket,
+		UrlRewrite:     params.UrlRewrite,
+		HeaderTransfor: params.HeaderTransfor,
+	}
+	if err := httpRule.Save(c, tx); err != nil {
+		tx.Rollback()
+		middleware.ResponseError(c, 2006, err)
+		return
+	}
+	accessControl := &dao.AccessControl{
+		ServiceID:         serviceModel.ID,
+		OpenAuth:          params.OpenAuth,
+		BlackList:         params.BlackList,
+		WhiteList:         params.WhiteList,
+		ClientIPFlowLimit: params.ClientipFlowLimit,
+		ServiceFlowLimit:  params.ServiceFlowLimit,
+	}
+	if err := accessControl.Save(c, tx); err != nil {
+		tx.Rollback()
+		middleware.ResponseError(c, 2007, err)
+		return
+	}
+
+	loadbalance := &dao.LoadBalance{
+		ServiceID:              serviceModel.ID,
+		RoundType:              params.RoundType,
+		IpList:                 params.IpList,
+		WeightList:             params.WeightList,
+		UpstreamConnectTimeout: params.UpstreamConnectTimeout,
+		UpstreamHeaderTimeout:  params.UpstreamHeaderTimeout,
+		UpstreamIdleTimeout:    params.UpstreamIdleTimeout,
+		UpstreamMaxIdle:        params.UpstreamMaxIdle,
+	}
+	if err := loadbalance.Save(c, tx); err != nil {
+		tx.Rollback()
+		middleware.ResponseError(c, 2008, err)
+		return
+	}
+	tx.Commit()
 	middleware.ResponseSuccess(c, "")
 }

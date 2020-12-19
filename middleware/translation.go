@@ -52,18 +52,21 @@ func TranslationMiddleware() gin.HandlerFunc {
 				return fl.Field().String() == "admin"
 			})
 			val.RegisterValidation("valid_service_name", func(fl validator.FieldLevel) bool {
-				matched, _ := regexp.Match(`[a-zA-Z0-9_]{6,128}`, []byte(fl.Field().String()))
+				matched, _ := regexp.Match(`^[a-zA-Z0-9_]{6,128}$`, []byte(fl.Field().String()))
 				return matched
 			})
 			val.RegisterValidation("valid_rule", func(fl validator.FieldLevel) bool {
-				matched, _ := regexp.Match(`\S+`,
+				matched, _ := regexp.Match(`^\S+$`,
 					[]byte(fl.Field().String()))
 				return matched
 			})
 			val.RegisterValidation("valid_url_rewrite", func(fl validator.FieldLevel) bool {
+				// 空字符串不进行校验
 				if fl.Field().String() == "" {
 					return true
 				}
+				// 每一行都是由替换前+空格+替换后构成
+				// 每行以逗号结尾
 				for _, ms := range strings.Split(fl.Field().String(), ",") {
 					if len(strings.Split(ms, " ")) != 2 {
 						return false
@@ -72,9 +75,12 @@ func TranslationMiddleware() gin.HandlerFunc {
 				return true
 			})
 			val.RegisterValidation("valid_header_transfer", func(fl validator.FieldLevel) bool {
+				// 空字符串不进行校验
 				if fl.Field().String() == "" {
 					return true
 				}
+				// 每一行格式为 add headname headvalue
+				// 每行以逗号结尾
 				for _, ms := range strings.Split(fl.Field().String(), ",") {
 					if len(strings.Split(ms, " ")) != 3 {
 						return false
@@ -83,6 +89,7 @@ func TranslationMiddleware() gin.HandlerFunc {
 				return true
 			})
 			val.RegisterValidation("valid_ipportlist", func(fl validator.FieldLevel) bool {
+				// 格式：127.0.0.1:80 多条换行
 				for _, ms := range strings.Split(fl.Field().String(), ",") {
 					if matched, _ := regexp.Match(`^\S+\:\d+$`, []byte(ms)); !matched {
 						return false
@@ -92,6 +99,7 @@ func TranslationMiddleware() gin.HandlerFunc {
 			})
 			val.RegisterValidation("valid_weightlist", func(fl validator.FieldLevel) bool {
 				fmt.Println(fl.Field().String())
+				// 格式：50 多条换行
 				for _, ms := range strings.Split(fl.Field().String(), ",") {
 					if matched, _ := regexp.Match(`^\d+$`, []byte(ms)); !matched {
 						return false
