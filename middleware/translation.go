@@ -97,6 +97,18 @@ func TranslationMiddleware() gin.HandlerFunc {
 				}
 				return true
 			})
+			val.RegisterValidation("valid_iplist", func(fl validator.FieldLevel) bool {
+				if fl.Field().String() == "" {
+					return true
+				}
+				for _, item := range strings.Split(fl.Field().String(), ",") {
+					matched, _ := regexp.Match(`\S+`, []byte(item)) //ip_addr
+					if !matched {
+						return false
+					}
+				}
+				return true
+			})
 			val.RegisterValidation("valid_weightlist", func(fl validator.FieldLevel) bool {
 				fmt.Println(fl.Field().String())
 				// 格式：50 多条换行
@@ -144,6 +156,12 @@ func TranslationMiddleware() gin.HandlerFunc {
 				return ut.Add("valid_ipportlist", "{0} 不符合输入格式", true)
 			}, func(ut ut.Translator, fe validator.FieldError) string {
 				t, _ := ut.T("valid_ipportlist", fe.Field())
+				return t
+			})
+			val.RegisterTranslation("valid_iplist", trans, func(ut ut.Translator) error {
+				return ut.Add("valid_iplist", "{0} 不符合输入格式", true)
+			}, func(ut ut.Translator, fe validator.FieldError) string {
+				t, _ := ut.T("valid_iplist", fe.Field())
 				return t
 			})
 			val.RegisterTranslation("valid_weightlist", trans, func(ut ut.Translator) error {

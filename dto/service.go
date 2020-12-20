@@ -5,6 +5,24 @@ import (
 	"go_gateway_demo/public"
 )
 
+type ServiceListInput struct {
+	Info     string `json:"info" form:"info" comment:"关键词" example:"" validate:""`
+	PageNo   int    `json:"page_no" form:"page_no" comment:"页数" example:"1" validate:"required"`
+	PageSize int    `json:"page_size" form:"page_size" comment:"每页条数" example:"20" validate:"required"`
+}
+
+func (param *ServiceListInput) BindValidParam(c *gin.Context) error {
+	return public.DefaultGetValidParams(c, param)
+}
+
+type ServiceDeleteInput struct {
+	ID int64 `json:"id" form:"id" comment:"服务ID" example:"56" validate:"required"`
+}
+
+func (param *ServiceDeleteInput) BindValidParam(c *gin.Context) error {
+	return public.DefaultGetValidParams(c, param)
+}
+
 type ServiceAddHTTPInput struct {
 	ServiceName string `json:"service_name" form:"service_name" comment:"服务名" example:"" validate:"required,valid_service_name"` //服务名
 	ServiceDesc string `json:"service_desc" form:"service_desc" comment:"服务描述" example:"" validate:"required,max=255,min=1"`     //服务描述
@@ -30,6 +48,10 @@ type ServiceAddHTTPInput struct {
 	UpstreamHeaderTimeout  int    `json:"upstream_header_timeout" form:"upstream_header_timeout" comment:"获取header超时, 单位s" example:"" validate:"min=0"` //获取header超时, 单位s
 	UpstreamIdleTimeout    int    `json:"upstream_idle_timeout" form:"upstream_idle_timeout" comment:"链接最大空闲时间, 单位s" example:"" validate:"min=0"`       //链接最大空闲时间, 单位s
 	UpstreamMaxIdle        int    `json:"upstream_max_idle" form:"upstream_max_idle" comment:"最大空闲链接数" example:"" validate:"min=0"`                     //最大空闲链接数
+}
+
+func (param *ServiceAddHTTPInput) BindValidParam(c *gin.Context) error {
+	return public.DefaultGetValidParams(c, param)
 }
 
 type ServiceUpdateHTTPInput struct {
@@ -60,30 +82,51 @@ type ServiceUpdateHTTPInput struct {
 	UpstreamMaxIdle        int    `json:"upstream_max_idle" form:"upstream_max_idle" comment:"最大空闲链接数" example:"" validate:"min=0"`                     //最大空闲链接数
 }
 
-func (param *ServiceAddHTTPInput) BindValidParam(c *gin.Context) error {
-	return public.DefaultGetValidParams(c, param)
-}
-
 func (param *ServiceUpdateHTTPInput) BindValidParam(c *gin.Context) error {
 	return public.DefaultGetValidParams(c, param)
 }
 
-type ServiceListInput struct {
-	Info     string `json:"info" form:"info" comment:"关键词" example:"" validate:""`
-	PageNo   int    `json:"page_no" form:"page_no" comment:"页数" example:"1" validate:"required"`
-	PageSize int    `json:"page_size" form:"page_size" comment:"每页条数" example:"20" validate:"required"`
+type ServiceAddTcpInput struct {
+	ServiceName    string `json:"service_name" form:"service_name" comment:"服务名称" validate:"required,valid_service_name"`
+	ServiceDesc    string `json:"service_desc" form:"service_desc" comment:"服务描述" validate:"required"`
+	Port           int    `json:"port" form:"port" comment:"端口，需要设置8001-8999范围内" validate:"required,min=8001,max=8999"`
+	HeaderTransfer string `json:"header_transfer" form:"header_transfer" comment:"header头转换" validate:"
+"`
+	OpenAuth          int    `json:"open_auth" form:"open_auth" comment:"是否开启权限验证" validate:""`
+	BlackList         string `json:"black_list" form:"black_list" comment:"黑名单IP，以逗号间隔，白名单优先级高于黑名单" validate:"valid_iplist"`
+	WhiteList         string `json:"white_list" form:"white_list" comment:"白名单IP，以逗号间隔，白名单优先级高于黑名单" validate:"valid_iplist"`
+	WhiteHostName     string `json:"white_host_name" form:"white_host_name" comment:"白名单主机，以逗号间隔" validate:"valid_iplist"`
+	ClientIPFlowLimit int    `json:"clientip_flow_limit" form:"clientip_flow_limit" comment:"客户端IP限流" validate:""`
+	ServiceFlowLimit  int    `json:"service_flow_limit" form:"service_flow_limit" comment:"服务端限流" validate:""`
+	RoundType         int    `json:"round_type" form:"round_type" comment:"轮询策略" validate:""`
+	IpList            string `json:"ip_list" form:"ip_list" comment:"IP列表" validate:"required,valid_ipportlist"`
+	WeightList        string `json:"weight_list" form:"weight_list" comment:"权重列表" validate:"required,valid_weightlist"`
+	ForbidList        string `json:"forbid_list" form:"forbid_list" comment:"禁用IP列表" validate:"valid_iplist"`
 }
 
-func (param *ServiceListInput) BindValidParam(c *gin.Context) error {
-	return public.DefaultGetValidParams(c, param)
+func (params *ServiceAddTcpInput) GetValidParams(c *gin.Context) error {
+	return public.DefaultGetValidParams(c, params)
 }
 
-type ServiceDeleteInput struct {
-	ID int64 `json:"id" form:"id" comment:"服务ID" example:"56" validate:"required"`
+type ServiceUpdateTcpInput struct {
+	ID                int64  `json:"id" form:"id" comment:"服务ID" validate:"required"`
+	ServiceName       string `json:"service_name" form:"service_name" comment:"服务名称" validate:"required,valid_service_name"`
+	ServiceDesc       string `json:"service_desc" form:"service_desc" comment:"服务描述" validate:"required"`
+	Port              int    `json:"port" form:"port" comment:"端口，需要设置8001-8999范围内" validate:"required,min=8001,max=8999"`
+	OpenAuth          int    `json:"open_auth" form:"open_auth" comment:"是否开启权限验证" validate:""`
+	BlackList         string `json:"black_list" form:"black_list" comment:"黑名单IP，以逗号间隔，白名单优先级高于黑名单" validate:"valid_iplist"`
+	WhiteList         string `json:"white_list" form:"white_list" comment:"白名单IP，以逗号间隔，白名单优先级高于黑名单" validate:"valid_iplist"`
+	WhiteHostName     string `json:"white_host_name" form:"white_host_name" comment:"白名单主机，以逗号间隔" validate:"valid_iplist"`
+	ClientIPFlowLimit int    `json:"clientip_flow_limit" form:"clientip_flow_limit" comment:"客户端IP限流" validate:""`
+	ServiceFlowLimit  int    `json:"service_flow_limit" form:"service_flow_limit" comment:"服务端限流" validate:""`
+	RoundType         int    `json:"round_type" form:"round_type" comment:"轮询策略" validate:""`
+	IpList            string `json:"ip_list" form:"ip_list" comment:"IP列表" validate:"required,valid_ipportlist"`
+	WeightList        string `json:"weight_list" form:"weight_list" comment:"权重列表" validate:"required,valid_weightlist"`
+	ForbidList        string `json:"forbid_list" form:"forbid_list" comment:"禁用IP列表" validate:"valid_iplist"`
 }
 
-func (param *ServiceDeleteInput) BindValidParam(c *gin.Context) error {
-	return public.DefaultGetValidParams(c, param)
+func (params *ServiceUpdateTcpInput) GetValidParams(c *gin.Context) error {
+	return public.DefaultGetValidParams(c, params)
 }
 
 type ServiceListItemOutput struct {
