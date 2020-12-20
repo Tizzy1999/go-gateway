@@ -10,6 +10,7 @@ import (
 	"go_gateway_demo/middleware"
 	"go_gateway_demo/public"
 	"strings"
+	"time"
 )
 
 type ServiceController struct {
@@ -21,6 +22,7 @@ func ServiceRegister(group *gin.RouterGroup) {
 	group.GET("/service_list", service.ServiceList)
 	group.GET("/service_delete", service.ServiceDelete)
 	group.GET("/service_detail", service.ServiceDetail)
+	group.GET("/service_stat", service.ServiceStat)
 	group.POST("/service_add_http", service.ServiceAddHTTP)
 	group.POST("/service_update_http", service.ServiceUpdateHTTP)
 }
@@ -150,6 +152,57 @@ func (service *ServiceController) ServiceDetail(c *gin.Context) {
 		return
 	}
 	middleware.ResponseSuccess(c, serviceDetail)
+}
+
+// ServiceStat godoc
+// @Summary 服务统计
+// @Description 服务统计
+// @Tags 服务管理
+// @ID /service/service_stat
+// @Accept  json
+// @Produce  json
+// @Param id query string true "服务ID"
+// @Success 200 {object} middleware.Response{data=dto.ServiceStatOutput} "success"
+// @Router /service/service_stat [get]
+func (service *ServiceController) ServiceStat(c *gin.Context) {
+	params := &dto.ServiceDeleteInput{}
+	if err := params.BindValidParam(c); err != nil {
+		middleware.ResponseError(c, 2000, err)
+		return
+	}
+	//tx, err := lib.GetGormPool("default")
+	//if err != nil {
+	//	middleware.ResponseError(c, 2001, err)
+	//	return
+	//}
+	//读取基本信息
+	//serviceInfo := &dao.ServiceInfo{ID: params.ID}
+	//先读取serviceInfo
+	//serviceInfo, err = serviceInfo.Find(c, tx, serviceInfo)
+	//if err != nil {
+	//	middleware.ResponseError(c, 2002, err)
+	//	return
+	//}
+	////根据serviceInfo读取serviceDetail，serviceDetail关联了5个表
+	//serviceDetail, err := serviceInfo.ServiceDetail(c, tx, serviceInfo)
+	//if err != nil {
+	//	middleware.ResponseError(c, 2003, err)
+	//	return
+	//}
+	// 昨天的数据
+	todayList := []int64{}
+	for i := 0; i <= time.Now().Hour(); i++ {
+		todayList = append(todayList, 0)
+	}
+	// 今天的数据
+	yesterdayList := []int64{}
+	for i := 0; i <= 23; i++ {
+		yesterdayList = append(yesterdayList, 0)
+	}
+	middleware.ResponseSuccess(c, &dto.ServiceStatOutput{
+		Today:     todayList,
+		Yesterday: yesterdayList,
+	})
 }
 
 // ServiceDelete godoc
@@ -321,7 +374,7 @@ func (service *ServiceController) ServiceUpdateHTTP(c *gin.Context) {
 	// 事务开始：提交http服务数据到数据库
 	tx = tx.Begin()
 	serviceInfo := &dao.ServiceInfo{ServiceName: params.ServiceName}
-	// 解决service description的修改保存问题
+	// 补充service description的修改保存问题
 	serviceInfo, err = serviceInfo.Find(c, tx, serviceInfo)
 	if err != nil {
 		tx.Rollback()
