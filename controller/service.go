@@ -20,6 +20,7 @@ func ServiceRegister(group *gin.RouterGroup) {
 	// 请求前缀 + action方法
 	group.GET("/service_list", service.ServiceList)
 	group.GET("/service_delete", service.ServiceDelete)
+	group.GET("/service_detail", service.ServiceDetail)
 	group.POST("/service_add_http", service.ServiceAddHTTP)
 	group.POST("/service_update_http", service.ServiceUpdateHTTP)
 }
@@ -111,6 +112,44 @@ func (service *ServiceController) ServiceList(c *gin.Context) {
 		List:  outList,
 	}
 	middleware.ResponseSuccess(c, out)
+}
+
+// ServiceDetail godoc
+// @Summary 服务详情
+// @Description 服务详情
+// @Tags 服务管理
+// @ID /service/service_detail
+// @Accept  json
+// @Produce  json
+// @Param id query string true "服务ID"
+// @Success 200 {object} middleware.Response{data=dao.ServiceDetail} "success"
+// @Router /service/service_detail [get]
+func (service *ServiceController) ServiceDetail(c *gin.Context) {
+	params := &dto.ServiceDeleteInput{}
+	if err := params.BindValidParam(c); err != nil {
+		middleware.ResponseError(c, 2000, err)
+		return
+	}
+	tx, err := lib.GetGormPool("default")
+	if err != nil {
+		middleware.ResponseError(c, 2001, err)
+		return
+	}
+	//读取基本信息
+	serviceInfo := &dao.ServiceInfo{ID: params.ID}
+	//先读取serviceInfo
+	serviceInfo, err = serviceInfo.Find(c, tx, serviceInfo)
+	if err != nil {
+		middleware.ResponseError(c, 2002, err)
+		return
+	}
+	//根据serviceInfo读取serviceDetail，serviceDetail关联了5个表
+	serviceDetail, err := serviceInfo.ServiceDetail(c, tx, serviceInfo)
+	if err != nil {
+		middleware.ResponseError(c, 2003, err)
+		return
+	}
+	middleware.ResponseSuccess(c, serviceDetail)
 }
 
 // ServiceDelete godoc
@@ -209,7 +248,7 @@ func (service *ServiceController) ServiceAddHTTP(c *gin.Context) {
 		NeedStripUri:   params.NeedStripUri,
 		NeedWebsocket:  params.NeedWebsocket,
 		UrlRewrite:     params.UrlRewrite,
-		HeaderTransfor: params.HeaderTransfor,
+		HeaderTransfor: params.HeaderTransfer,
 	}
 	if err := httpRule.Save(c, tx); err != nil {
 		tx.Rollback()
@@ -282,10 +321,25 @@ func (service *ServiceController) ServiceUpdateHTTP(c *gin.Context) {
 	// 事务开始：提交http服务数据到数据库
 	tx = tx.Begin()
 	serviceInfo := &dao.ServiceInfo{ServiceName: params.ServiceName}
-	serviceDetail, err := serviceInfo.ServiceDetail(c, tx, serviceInfo)
+	// 解决service description的修改保存问题
+	serviceInfo, err = serviceInfo.Find(c, tx, serviceInfo)
 	if err != nil {
 		tx.Rollback()
 		middleware.ResponseError(c, 2003, errors.New("服务不存在"))
+		return
+	}
+	serviceDetail, err := serviceInfo.ServiceDetail(c, tx, serviceInfo)
+	if err != nil {
+		tx.Rollback()
+		middleware.ResponseError(c, 2004, errors.New("服务不存在"))
+		return
+	}
+
+	info := serviceDetail.Info
+	info.ServiceDesc = params.ServiceDesc
+	if err := info.Save(c, tx); err != nil {
+		tx.Rollback()
+		middleware.ResponseError(c, 2005, err)
 		return
 	}
 
@@ -294,10 +348,10 @@ func (service *ServiceController) ServiceUpdateHTTP(c *gin.Context) {
 	httpRule.NeedStripUri = params.NeedStripUri
 	httpRule.NeedWebsocket = params.NeedWebsocket
 	httpRule.UrlRewrite = params.UrlRewrite
-	httpRule.HeaderTransfor = params.HeaderTransfor
+	httpRule.HeaderTransfor = params.HeaderTransfer
 	if err := httpRule.Save(c, tx); err != nil {
 		tx.Rollback()
-		middleware.ResponseError(c, 2004, err)
+		middleware.ResponseError(c, 2006, err)
 		return
 	}
 
@@ -309,7 +363,7 @@ func (service *ServiceController) ServiceUpdateHTTP(c *gin.Context) {
 	accessControl.ServiceFlowLimit = params.ServiceFlowLimit
 	if err := accessControl.Save(c, tx); err != nil {
 		tx.Rollback()
-		middleware.ResponseError(c, 2005, err)
+		middleware.ResponseError(c, 2007, err)
 		return
 	}
 	loadBalance := serviceDetail.LoadBalance
@@ -322,7 +376,7 @@ func (service *ServiceController) ServiceUpdateHTTP(c *gin.Context) {
 	loadBalance.UpstreamMaxIdle = params.UpstreamMaxIdle
 	if err := loadBalance.Save(c, tx); err != nil {
 		tx.Rollback()
-		middleware.ResponseError(c, 2006, err)
+		middleware.ResponseError(c, 2008, err)
 		return
 	}
 	// 事务结束：提交http服务数据到数据库
