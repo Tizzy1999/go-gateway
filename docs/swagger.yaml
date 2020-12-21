@@ -20,7 +20,7 @@ definitions:
     type: object
   dao.GrpcRule:
     properties:
-      header_transfor:
+      header_transfer:
         type: string
       id:
         type: integer
@@ -31,7 +31,7 @@ definitions:
     type: object
   dao.HttpRule:
     properties:
-      header_transfor:
+      header_transfer:
         type: string
       id:
         type: integer
@@ -148,6 +148,43 @@ definitions:
         type: string
     required:
     - password
+    type: object
+  dto.ServiceAddGrpcInput:
+    properties:
+      black_list:
+        type: string
+      clientip_flow_limit:
+        type: integer
+      forbid_list:
+        type: string
+      header_transfer:
+        type: string
+      ip_list:
+        type: string
+      open_auth:
+        type: integer
+      port:
+        type: integer
+      round_type:
+        type: integer
+      service_desc:
+        type: string
+      service_flow_limit:
+        type: integer
+      service_name:
+        type: string
+      weight_list:
+        type: string
+      white_host_name:
+        type: string
+      white_list:
+        type: string
+    required:
+    - ip_list
+    - port
+    - service_desc
+    - service_name
+    - weight_list
     type: object
   dto.ServiceAddHTTPInput:
     properties:
@@ -308,6 +345,46 @@ definitions:
         items:
           type: integer
         type: array
+    type: object
+  dto.ServiceUpdateGrpcInput:
+    properties:
+      black_list:
+        type: string
+      clientip_flow_limit:
+        type: integer
+      forbid_list:
+        type: string
+      header_transfer:
+        type: string
+      id:
+        type: integer
+      ip_list:
+        type: string
+      open_auth:
+        type: integer
+      port:
+        type: integer
+      round_type:
+        type: integer
+      service_desc:
+        type: string
+      service_flow_limit:
+        type: integer
+      service_name:
+        type: string
+      weight_list:
+        type: string
+      white_host_name:
+        type: string
+      white_list:
+        type: string
+    required:
+    - id
+    - ip_list
+    - port
+    - service_desc
+    - service_name
+    - weight_list
     type: object
   dto.ServiceUpdateHTTPInput:
     properties:
@@ -542,6 +619,34 @@ paths:
       summary: 管理员退出
       tags:
       - 管理员接口
+  /service/service_add_grpc:
+    post:
+      consumes:
+      - application/json
+      description: grpc服务添加
+      operationId: /service/service_add_grpc
+      parameters:
+      - description: body
+        in: body
+        name: body
+        required: true
+        schema:
+          $ref: '#/definitions/dto.ServiceAddGrpcInput'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: success
+          schema:
+            allOf:
+            - $ref: '#/definitions/middleware.Response'
+            - properties:
+                data:
+                  type: string
+              type: object
+      summary: grpc服务添加
+      tags:
+      - 服务管理
   /service/service_add_http:
     post:
       consumes:
@@ -713,6 +818,34 @@ paths:
                   $ref: '#/definitions/dto.ServiceStatOutput'
               type: object
       summary: 服务统计
+      tags:
+      - 服务管理
+  /service/service_update_grpc:
+    post:
+      consumes:
+      - application/json
+      description: grpc服务更新
+      operationId: /service/service_update_grpc
+      parameters:
+      - description: body
+        in: body
+        name: body
+        required: true
+        schema:
+          $ref: '#/definitions/dto.ServiceUpdateGrpcInput'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: success
+          schema:
+            allOf:
+            - $ref: '#/definitions/middleware.Response'
+            - properties:
+                data:
+                  type: string
+              type: object
+      summary: grpc服务更新
       tags:
       - 服务管理
   /service/service_update_http:

@@ -190,6 +190,53 @@ var doc = `{
                 }
             }
         },
+        "/service/service_add_grpc": {
+            "post": {
+                "description": "grpc服务添加",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "服务管理"
+                ],
+                "summary": "grpc服务添加",
+                "operationId": "/service/service_add_grpc",
+                "parameters": [
+                    {
+                        "description": "body",
+                        "name": "body",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/dto.ServiceAddGrpcInput"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "success",
+                        "schema": {
+                            "allOf": [
+                                {
+                                    "$ref": "#/definitions/middleware.Response"
+                                },
+                                {
+                                    "type": "object",
+                                    "properties": {
+                                        "data": {
+                                            "type": "string"
+                                        }
+                                    }
+                                }
+                            ]
+                        }
+                    }
+                }
+            }
+        },
         "/service/service_add_http": {
             "post": {
                 "description": "添加HTTP服务",
@@ -477,6 +524,53 @@ var doc = `{
                 }
             }
         },
+        "/service/service_update_grpc": {
+            "post": {
+                "description": "grpc服务更新",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "服务管理"
+                ],
+                "summary": "grpc服务更新",
+                "operationId": "/service/service_update_grpc",
+                "parameters": [
+                    {
+                        "description": "body",
+                        "name": "body",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/dto.ServiceUpdateGrpcInput"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "success",
+                        "schema": {
+                            "allOf": [
+                                {
+                                    "$ref": "#/definitions/middleware.Response"
+                                },
+                                {
+                                    "type": "object",
+                                    "properties": {
+                                        "data": {
+                                            "type": "string"
+                                        }
+                                    }
+                                }
+                            ]
+                        }
+                    }
+                }
+            }
+        },
         "/service/service_update_http": {
             "post": {
                 "description": "修改HTTP服务",
@@ -605,7 +699,7 @@ var doc = `{
         "dao.GrpcRule": {
             "type": "object",
             "properties": {
-                "header_transfor": {
+                "header_transfer": {
                     "type": "string"
                 },
                 "id": {
@@ -622,7 +716,7 @@ var doc = `{
         "dao.HttpRule": {
             "type": "object",
             "properties": {
-                "header_transfor": {
+                "header_transfer": {
                     "type": "string"
                 },
                 "id": {
@@ -794,6 +888,60 @@ var doc = `{
                 "password": {
                     "type": "string",
                     "example": "123456"
+                }
+            }
+        },
+        "dto.ServiceAddGrpcInput": {
+            "type": "object",
+            "required": [
+                "ip_list",
+                "port",
+                "service_desc",
+                "service_name",
+                "weight_list"
+            ],
+            "properties": {
+                "black_list": {
+                    "type": "string"
+                },
+                "clientip_flow_limit": {
+                    "type": "integer"
+                },
+                "forbid_list": {
+                    "type": "string"
+                },
+                "header_transfer": {
+                    "type": "string"
+                },
+                "ip_list": {
+                    "type": "string"
+                },
+                "open_auth": {
+                    "type": "integer"
+                },
+                "port": {
+                    "type": "integer"
+                },
+                "round_type": {
+                    "type": "integer"
+                },
+                "service_desc": {
+                    "type": "string"
+                },
+                "service_flow_limit": {
+                    "type": "integer"
+                },
+                "service_name": {
+                    "type": "string"
+                },
+                "weight_list": {
+                    "type": "string"
+                },
+                "white_host_name": {
+                    "type": "string"
+                },
+                "white_list": {
+                    "type": "string"
                 }
             }
         },
@@ -1016,6 +1164,64 @@ var doc = `{
                     "items": {
                         "type": "integer"
                     }
+                }
+            }
+        },
+        "dto.ServiceUpdateGrpcInput": {
+            "type": "object",
+            "required": [
+                "id",
+                "ip_list",
+                "port",
+                "service_desc",
+                "service_name",
+                "weight_list"
+            ],
+            "properties": {
+                "black_list": {
+                    "type": "string"
+                },
+                "clientip_flow_limit": {
+                    "type": "integer"
+                },
+                "forbid_list": {
+                    "type": "string"
+                },
+                "header_transfer": {
+                    "type": "string"
+                },
+                "id": {
+                    "type": "integer"
+                },
+                "ip_list": {
+                    "type": "string"
+                },
+                "open_auth": {
+                    "type": "integer"
+                },
+                "port": {
+                    "type": "integer"
+                },
+                "round_type": {
+                    "type": "integer"
+                },
+                "service_desc": {
+                    "type": "string"
+                },
+                "service_flow_limit": {
+                    "type": "integer"
+                },
+                "service_name": {
+                    "type": "string"
+                },
+                "weight_list": {
+                    "type": "string"
+                },
+                "white_host_name": {
+                    "type": "string"
+                },
+                "white_list": {
+                    "type": "string"
                 }
             }
         },
