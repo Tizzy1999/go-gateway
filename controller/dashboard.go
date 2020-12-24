@@ -129,7 +129,7 @@ func (service *DashboardController) ServiceStat(c *gin.Context) {
 	}
 	out := &dto.DashServiceStatOutput{
 		Legend: legend,
-		Data:   list,
+		Series: list,
 	}
 	middleware.ResponseSuccess(c, out)
 }
