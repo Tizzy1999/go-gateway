@@ -1,6 +1,7 @@
 package dao
 
 import (
+	"fmt"
 	"github.com/e421083458/golang_common/lib"
 	"github.com/e421083458/gorm"
 	"github.com/gin-gonic/gin"
@@ -97,6 +98,7 @@ func (s *AppManager) GetAppList() []*App {
 
 func (s *AppManager) LoadOnce() error {
 	s.init.Do(func() {
+		fmt.Println("App s.init.Do")
 		appInfo := &App{}
 		c, _ := gin.CreateTestContext(httptest.NewRecorder())
 		tx, err := lib.GetGormPool("default")
@@ -105,7 +107,8 @@ func (s *AppManager) LoadOnce() error {
 			return
 		}
 		params := &dto.APPListInput{PageNo: 1, PageSize: 99999}
-		list, _, err := appInfo.APPList(c, tx, params)
+		list, cnt, err := appInfo.APPList(c, tx, params)
+		fmt.Println("LoadOnce: count = ", cnt)
 		if err != nil {
 			s.err = err
 			return

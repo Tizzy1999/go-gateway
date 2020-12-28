@@ -4,6 +4,7 @@ go 1.14
 
 require (
 	github.com/alecthomas/template v0.0.0-20190718012654-fb15b899a751
+	github.com/dgrijalva/jwt-go v3.2.0+incompatible
 	github.com/e421083458/gin_scaffold v0.0.0-20200502033629-13733b8c6903
 	github.com/e421083458/golang_common v1.0.3
 	github.com/e421083458/gorm v1.0.1
