@@ -45,7 +45,7 @@ func NewRedisFlowCountService(appID string, interval time.Duration) *RedisFlowCo
 				c.Send("INCRBY", hourKey, tickerCount)
 				c.Send("EXPIRE", hourKey, 86400*2)
 			}); err != nil {
-				fmt.Println("RedisConfPipline err", err)
+				fmt.Println("RedisConfPipeline err", err)
 				continue
 			}
 
@@ -71,6 +71,7 @@ func NewRedisFlowCountService(appID string, interval time.Duration) *RedisFlowCo
 }
 
 func (o *RedisFlowCountService) GetDayKey(t time.Time) string {
+	// 自动设置中国时区
 	dayStr := t.In(lib.TimeLocation).Format("20060102")
 	return fmt.Sprintf("%s_%s_%s", RedisFlowDayKey, dayStr, o.AppID)
 }
@@ -79,13 +80,12 @@ func (o *RedisFlowCountService) GetHourKey(t time.Time) string {
 	hourStr := t.In(lib.TimeLocation).Format("2006010215")
 	return fmt.Sprintf("%s_%s_%s", RedisFlowHourKey, hourStr, o.AppID)
 }
+func (o *RedisFlowCountService) GetDayData(t time.Time) (int64, error) {
+	return redis.Int64(RedisConfDo("GET", o.GetDayKey(t)))
+}
 
 func (o *RedisFlowCountService) GetHourData(t time.Time) (int64, error) {
 	return redis.Int64(RedisConfDo("GET", o.GetHourKey(t)))
-}
-
-func (o *RedisFlowCountService) GetDayData(t time.Time) (int64, error) {
-	return redis.Int64(RedisConfDo("GET", o.GetDayKey(t)))
 }
 
 //原子增加

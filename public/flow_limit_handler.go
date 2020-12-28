@@ -37,6 +37,7 @@ func (counter *FlowLimiter) GetLimiter(serverName string, qps float64) (*rate.Li
 		}
 	}
 
+	// 每秒产生的token数以及最大的token数量
 	newLimiter := rate.NewLimiter(rate.Limit(qps), int(qps*3))
 	item := &FlowLimiterItem{
 		ServiceName: serverName,

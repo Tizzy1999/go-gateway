@@ -17,7 +17,7 @@
 [log]
     log_level = "trace"         #日志打印最低级别
     [log.file_writer]           #文件写入配置
-        on = true
+        on = false              #压测的时候关闭日志读写，不然会消耗性能
         log_path = "./logs/go_gateway_demo.inf.log"
         rotate_log_path = "./logs/go_gateway_demo.inf.log.%Y%M%D%H"
         wf_log_path = "./logs/go_gateway_demo.wf.log"
@@ -35,6 +35,6 @@
 
 [cluster]
     cluster_ip="127.0.0.1"
-    cluster_port="8880"
-    cluster_ssl_port="4880"
+    cluster_port="8081"
+    cluster_ssl_port="4433"
 

@@ -2,7 +2,6 @@ package dao
 
 import (
 	"errors"
-	"fmt"
 	"github.com/e421083458/golang_common/lib"
 	"github.com/gin-gonic/gin"
 	"go_gateway_demo/dto"
@@ -57,7 +56,7 @@ func (s *ServiceManager) HTTPAccessMode(c *gin.Context) (*ServiceDetail, error) 
 	*/
 	host := c.Request.Host // www.test.com:8080
 	host = host[0:strings.Index(host, ":")]
-	fmt.Println("host", host)
+	//fmt.Println("host", host)
 	path := c.Request.URL.Path
 	for _, serviceItem := range s.ServiceSlice {
 		if serviceItem.Info.LoadType != public.LoadTypeHTTP {

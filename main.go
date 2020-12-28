@@ -4,7 +4,6 @@ import (
 	"flag"
 	"fmt"
 	"github.com/e421083458/golang_common/lib"
-	"go_gateway_demo/dao"
 	"go_gateway_demo/http_proxy_router"
 	"go_gateway_demo/router"
 	"os"
@@ -13,7 +12,7 @@ import (
 )
 
 /**
-endpoint dashboard后台管理 server代理服务器
+endpoint dashboard 后台管理 server 代理服务器
 config ./conf/prod/ 对应配置文件夹
 */
 var (
@@ -22,7 +21,7 @@ var (
 )
 
 func main() {
-	flag.Parse() //参数配置
+	flag.Parse()
 	if *endpoint == "" {
 		flag.Usage()
 		os.Exit(1)
@@ -45,9 +44,7 @@ func main() {
 	} else {
 		lib.InitModule(*config, []string{"base", "mysql", "redis"})
 		defer lib.Destroy()
-		// 加载服务列表到内存中
-		dao.ServiceManagerHandler.LoadOnce()
-		// 利用协程，可同时启动多个服务器http/https
+		// 利用协程，启动多个服务
 		go func() {
 			http_proxy_router.HttpServerRun()
 		}()

@@ -21,6 +21,7 @@ func NewFlowCounter() *FlowCounter {
 	}
 }
 
+// 单例流量统计，每个服务都生成一个flow count
 func init() {
 	FlowCounterHandler = NewFlowCounter()
 }
@@ -31,8 +32,8 @@ func (counter *FlowCounter) GetCounter(serverName string) (*RedisFlowCountServic
 			return item, nil
 		}
 	}
-
-	newCounter := NewRedisFlowCountService(serverName, 1*time.Second)
+	// 一秒刷新一次
+	newCounter := NewRedisFlowCountService(serverName, time.Second)
 	counter.RedisFlowCountSlice = append(counter.RedisFlowCountSlice, newCounter)
 	counter.Locker.Lock()
 	defer counter.Locker.Unlock()

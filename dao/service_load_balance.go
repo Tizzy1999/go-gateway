@@ -1,10 +1,16 @@
 package dao
 
 import (
+	"fmt"
 	"github.com/e421083458/gorm"
 	"github.com/gin-gonic/gin"
 	"go_gateway_demo/public"
+	"go_gateway_demo/reverse_proxy/load_balance"
+	"net"
+	"net/http"
 	"strings"
+	"sync"
+	"time"
 )
 
 type LoadBalance struct {
@@ -43,4 +49,140 @@ func (t *LoadBalance) Save(c *gin.Context, tx *gorm.DB) error {
 
 func (t *LoadBalance) GetIPListByModel() []string {
 	return strings.Split(t.IpList, ",")
+}
+func (t *LoadBalance) GetWeightListByModel() []string {
+	return strings.Split(t.WeightList, ",")
+}
+
+var LoadBalancerHandler *LoadBalancer
+
+type LoadBalancer struct {
+	//服务多的时候用map，可以快速通过服务名找到对应服务
+	LoadBalanceMap map[string]*LoadBalancerItem
+	//服务少的时候用slice遍历，减少锁的开销
+	LoadBalanceSlice []*LoadBalancerItem
+	Locker           sync.RWMutex
+}
+
+type LoadBalancerItem struct {
+	LoadBalance load_balance.LoadBalance
+	ServiceName string
+}
+
+func NewLoadBalancer() *LoadBalancer {
+	return &LoadBalancer{
+		LoadBalanceMap:   map[string]*LoadBalancerItem{},
+		LoadBalanceSlice: []*LoadBalancerItem{},
+		Locker:           sync.RWMutex{},
+	}
+}
+
+func init() {
+	LoadBalancerHandler = NewLoadBalancer()
+}
+
+func (lbr *LoadBalancer) GetLoadBalancer(service *ServiceDetail) (load_balance.LoadBalance, error) {
+	for _, loadBalanceItem := range lbr.LoadBalanceSlice {
+		if loadBalanceItem.ServiceName == service.Info.ServiceName {
+			return loadBalanceItem.LoadBalance, nil
+		}
+	}
+	schema := "http://"
+	if service.HTTPRule.NeedHttps == 1 {
+		schema = "https://"
+	}
+
+	// 得到ip列表和权重列表
+	ipList := service.LoadBalance.GetIPListByModel()
+	weightList := service.LoadBalance.GetWeightListByModel()
+	ipConf := map[string]string{}
+	for ipIndex, ipItem := range ipList {
+		ipConf[ipItem] = weightList[ipIndex]
+	}
+	mConf, err := load_balance.NewLoadBalanceCheckConf(
+		fmt.Sprintf("%s%s", schema, "%s"),
+		ipConf)
+	if err != nil {
+		return nil, err
+	}
+	lb := load_balance.LoadBanlanceFactorWithConf(load_balance.LbType(service.LoadBalance.RoundType), mConf)
+
+	// save to map and slice
+	lbItem := &LoadBalancerItem{
+		LoadBalance: lb,
+		ServiceName: service.Info.ServiceName,
+	}
+	lbr.LoadBalanceSlice = append(lbr.LoadBalanceSlice, lbItem)
+	lbr.LoadBalanceMap[lbItem.ServiceName] = lbItem
+	return lb, nil
+}
+
+var TransportorHandler *Transportor
+
+//每个服务对应一个连接池
+type Transportor struct {
+	TransportMap   map[string]*TransportItem
+	TransportSlice []*TransportItem
+	Locker         sync.RWMutex
+}
+
+type TransportItem struct {
+	Trans       *http.Transport
+	ServiceName string
+}
+
+func NewTransportor() *Transportor {
+	return &Transportor{
+		TransportMap:   map[string]*TransportItem{},
+		TransportSlice: []*TransportItem{},
+		Locker:         sync.RWMutex{},
+	}
+}
+
+func init() {
+	TransportorHandler = NewTransportor()
+}
+
+func (t *Transportor) GetTrans(service *ServiceDetail) (*http.Transport, error) {
+	// 若service连接池已存在，直接返回
+	for _, transItem := range t.TransportSlice {
+		if transItem.ServiceName == service.Info.ServiceName {
+			return transItem.Trans, nil
+		}
+	}
+	//todo 优化点5
+	//设置默认值可以提高性能
+	if service.LoadBalance.UpstreamConnectTimeout == 0 {
+		service.LoadBalance.UpstreamConnectTimeout = 30
+	}
+	if service.LoadBalance.UpstreamMaxIdle == 0 {
+		service.LoadBalance.UpstreamMaxIdle = 100
+	}
+	if service.LoadBalance.UpstreamIdleTimeout == 0 {
+		service.LoadBalance.UpstreamIdleTimeout = 90
+	}
+	if service.LoadBalance.UpstreamHeaderTimeout == 0 {
+		service.LoadBalance.UpstreamHeaderTimeout = 30
+	}
+	// 若不存在，创建新的连接池
+	trans := &http.Transport{
+		DialContext: (&net.Dialer{
+			Timeout:   time.Duration(service.LoadBalance.UpstreamConnectTimeout) * time.Second,
+			KeepAlive: 30 * time.Second,
+		}).DialContext,
+		ForceAttemptHTTP2:     true,
+		MaxIdleConns:          service.LoadBalance.UpstreamMaxIdle,
+		IdleConnTimeout:       time.Duration(service.LoadBalance.UpstreamIdleTimeout) * time.Second,
+		TLSHandshakeTimeout:   10 * time.Second,
+		ResponseHeaderTimeout: time.Duration(service.LoadBalance.UpstreamHeaderTimeout) * time.Second,
+	}
+	transItem := &TransportItem{
+		Trans:       trans,
+		ServiceName: service.Info.ServiceName,
+	}
+	t.TransportSlice = append(t.TransportSlice, transItem)
+	t.Locker.Lock()
+	defer t.Locker.Unlock()
+	t.TransportMap[service.Info.ServiceName] = transItem
+	return trans, nil
 }
