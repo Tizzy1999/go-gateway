@@ -117,7 +117,7 @@ func (service *ServiceController) ServiceList(c *gin.Context) {
 			Qpd:         counter.TotalCount,
 			TotalNode:   len(ipList),
 		}
-		fmt.Printf("service id: %d, qps: %d \n", outItem.ID, outItem.Qps)
+		//fmt.Printf("service id: %d, qps: %d \n", outItem.ID, outItem.Qps)
 		outList = append(outList, outItem)
 	}
 	out := &dto.ServiceListOutput{

@@ -8,6 +8,7 @@ import (
 	"go_gateway_demo/dto"
 	"go_gateway_demo/middleware"
 	"go_gateway_demo/public"
+	"time"
 )
 
 //APPControllerRegister admin路由注册
@@ -15,7 +16,7 @@ func APPRegister(router *gin.RouterGroup) {
 	admin := APPController{}
 	router.GET("/app_list", admin.APPList)
 	router.GET("/app_detail", admin.APPDetail)
-	//router.GET("/app_stat", admin.AppStatistics)
+	router.GET("/app_stat", admin.AppStatistics)
 	router.GET("/app_delete", admin.APPDelete)
 	router.POST("/app_add", admin.AppAdd)
 	router.POST("/app_update", admin.AppUpdate)
@@ -224,5 +225,65 @@ func (admin *APPController) AppUpdate(c *gin.Context) {
 		return
 	}
 	middleware.ResponseSuccess(c, "")
+	return
+}
+
+// AppStatistics godoc
+// @Summary 租户统计
+// @Description 租户统计
+// @Tags 租户管理
+// @ID /app/app_stat
+// @Accept  json
+// @Produce  json
+// @Param id query string true "租户ID"
+// @Success 200 {object} middleware.Response{data=dto.StatisticsOutput} "success"
+// @Router /app/app_stat [get]
+func (admin *APPController) AppStatistics(c *gin.Context) {
+	params := &dto.APPDetailInput{}
+	if err := params.GetValidParams(c); err != nil {
+		middleware.ResponseError(c, 2001, err)
+		return
+	}
+
+	search := &dao.App{
+		ID: params.ID,
+	}
+	detail, err := search.Find(c, lib.GORMDefaultPool, search)
+	if err != nil {
+		middleware.ResponseError(c, 2002, err)
+		return
+	}
+
+
+	counter, err := public.FlowCounterHandler.GetCounter(public.FlowAppPrefix + detail.AppID)
+	if err != nil {
+		middleware.ResponseError(c, 2003, err)
+		c.Abort()
+		return
+	}
+	//今日流量全天小时级访问统计
+	todayStat := []int64{}
+	currentTime:= time.Now()
+	for i := 0; i <= time.Now().In(lib.TimeLocation).Hour(); i++ {
+		dateTime:=time.Date(currentTime.Year(),currentTime.Month(),currentTime.Day(),i,0,0,0,lib.TimeLocation)
+		hourData,_:=counter.GetHourData(dateTime)
+		todayStat = append(todayStat, hourData)
+	}
+
+	//昨日流量全天小时级访问统计
+	yesterdayStat := []int64{}
+	yesterTime:= currentTime.Add(-1*time.Duration(time.Hour*24))
+	for i := 0; i <= 23; i++ {
+		dateTime:=time.Date(yesterTime.Year(),yesterTime.Month(),yesterTime.Day(),i,0,0,0,lib.TimeLocation)
+		hourData,_:=counter.GetHourData(dateTime)
+		yesterdayStat = append(yesterdayStat, hourData)
+	}
+	stat := dto.StatisticsOutput{
+		Today:     todayStat,
+		Yesterday: yesterdayStat,
+	}
+	//fmt.Printf("todayAppStat: %d \n",todayStat)
+	//fmt.Printf("yesterdayAppStat: %d \n",yesterdayStat)
+	middleware.ResponseSuccess(c, stat)
 	return
 }
