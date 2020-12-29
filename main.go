@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"github.com/e421083458/golang_common/lib"
 	"go_gateway_demo/dao"
+	"go_gateway_demo/grpc_proxy_router"
 	"go_gateway_demo/http_proxy_router"
 	"go_gateway_demo/router"
 	"go_gateway_demo/tcp_proxy_router"
@@ -58,11 +59,15 @@ func main() {
 		go func() {
 			tcp_proxy_router.TcpServerRun()
 		}()
+		go func() {
+			grpc_proxy_router.GrpcServerRun()
+		}()
 		fmt.Println("start server")
 		quit := make(chan os.Signal)
 		signal.Notify(quit, syscall.SIGINT, syscall.SIGTERM)
 		<-quit
 		fmt.Println("server stopping")
+		grpc_proxy_router.GrpcServerStop()
 		tcp_proxy_router.TcpServerStop()
 		http_proxy_router.HttpServerStop()
 		http_proxy_router.HttpsServerStop()

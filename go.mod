@@ -8,16 +8,19 @@ require (
 	github.com/e421083458/gin_scaffold v0.0.0-20200502033629-13733b8c6903
 	github.com/e421083458/golang_common v1.0.3
 	github.com/e421083458/gorm v1.0.1
+	github.com/e421083458/grpc-proxy v0.2.0
 	github.com/garyburd/redigo v1.6.0
 	github.com/gin-gonic/contrib v0.0.0-20190526021735-7fb7810ed2a0
 	github.com/gin-gonic/gin v1.4.0
 	github.com/go-playground/locales v0.12.1
 	github.com/go-playground/universal-translator v0.16.0
+	github.com/mwitkow/grpc-proxy v0.0.0-20181017164139-0f1106ef9c76 // indirect
 	github.com/pkg/errors v0.8.1
 	github.com/swaggo/files v0.0.0-20190704085106-630677cd5c14
 	github.com/swaggo/gin-swagger v1.2.0
 	github.com/swaggo/swag v1.6.5
 	golang.org/x/time v0.0.0-20181108054448-85acf8d2951c
+	google.golang.org/grpc v1.30.0-dev.1
 	gopkg.in/go-playground/validator.v9 v9.29.0
 )
 
