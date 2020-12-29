@@ -2,7 +2,6 @@ package load_balance
 
 import (
 	"errors"
-	"fmt"
 	"strings"
 )
 
@@ -52,7 +51,7 @@ func (r *RoundRobinBalance) Update() {
 	//	}
 	//}
 	if conf, ok := r.conf.(*LoadBalanceCheckConf); ok {
-		fmt.Println("Update get check conf:", conf.GetConf())
+		//fmt.Println("Update get check conf:", conf.GetConf())
 		r.rss = nil
 		for _, ip := range conf.GetConf() {
 			r.Add(strings.Split(ip, ",")...)

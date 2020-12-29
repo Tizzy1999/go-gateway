@@ -23,16 +23,16 @@ func HTTPJwtFlowLimitMiddleware() gin.HandlerFunc {
 			clientLimiter, err := public.FlowLimiterHandler.GetLimiter(
 				public.FlowAppPrefix+appInfo.AppID+"_"+c.ClientIP(),
 				float64(appInfo.Qps))
-		if err!=nil{
-			middleware.ResponseError(c, 5001, err)
-			c.Abort()
-			return
-		}
-		if !clientLimiter.Allow(){
-			middleware.ResponseError(c, 5002, errors.New(fmt.Sprintf("%v flow limit %v", c.ClientIP(), appInfo.Qps), ))
-			c.Abort()
-			return
-		}
+			if err != nil {
+				middleware.ResponseError(c, 5001, err)
+				c.Abort()
+				return
+			}
+			if !clientLimiter.Allow() {
+				middleware.ResponseError(c, 5002, errors.New(fmt.Sprintf("%v flow limit %v", c.ClientIP(), appInfo.Qps)))
+				c.Abort()
+				return
+			}
 		}
 		c.Next()
 	}

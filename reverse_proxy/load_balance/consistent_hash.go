@@ -2,7 +2,6 @@ package load_balance
 
 import (
 	"errors"
-	"fmt"
 	"hash/crc32"
 	"sort"
 	"strconv"
@@ -99,10 +98,10 @@ func (c *ConsistentHashBanlance) SetConf(conf LoadBalanceConf) {
 
 func (c *ConsistentHashBanlance) Update() {
 	if conf, ok := c.conf.(*LoadBalanceCheckConf); ok {
-		fmt.Println("Update get check conf:", conf.GetConf())
+		//fmt.Println("Update get check conf:", conf.GetConf())
 		c.keys = nil
 		c.hashMap = map[uint32]string{}
-		fmt.Println("conf.GetConf()", conf.GetConf())
+		//fmt.Println("conf.GetConf()", conf.GetConf())
 		for _, ip := range conf.GetConf() {
 			c.Add(strings.Split(ip, ",")...)
 		}

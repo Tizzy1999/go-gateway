@@ -82,16 +82,18 @@ func init() {
 }
 
 func (lbr *LoadBalancer) GetLoadBalancer(service *ServiceDetail) (load_balance.LoadBalance, error) {
-	for _, loadBalanceItem := range lbr.LoadBalanceSlice {
-		if loadBalanceItem.ServiceName == service.Info.ServiceName {
-			return loadBalanceItem.LoadBalance, nil
+	for _, lbrItem := range lbr.LoadBalanceSlice {
+		if lbrItem.ServiceName == service.Info.ServiceName {
+			return lbrItem.LoadBalance, nil
 		}
 	}
 	schema := "http://"
 	if service.HTTPRule.NeedHttps == 1 {
 		schema = "https://"
 	}
-
+	if service.Info.LoadType == public.LoadTypeTCP || service.Info.LoadType == public.LoadTypeGRPC {
+		schema = ""
+	}
 	// 得到ip列表和权重列表
 	ipList := service.LoadBalance.GetIPListByModel()
 	weightList := service.LoadBalance.GetWeightListByModel()
@@ -113,7 +115,9 @@ func (lbr *LoadBalancer) GetLoadBalancer(service *ServiceDetail) (load_balance.L
 		ServiceName: service.Info.ServiceName,
 	}
 	lbr.LoadBalanceSlice = append(lbr.LoadBalanceSlice, lbItem)
-	lbr.LoadBalanceMap[lbItem.ServiceName] = lbItem
+	lbr.Locker.Lock()
+	defer lbr.Locker.Unlock()
+	lbr.LoadBalanceMap[service.Info.ServiceName] = lbItem
 	return lb, nil
 }
 

@@ -7,6 +7,7 @@ import (
 	"go_gateway_demo/dao"
 	"go_gateway_demo/http_proxy_router"
 	"go_gateway_demo/router"
+	"go_gateway_demo/tcp_proxy_router"
 	"os"
 	"os/signal"
 	"syscall"
@@ -54,13 +55,18 @@ func main() {
 		go func() {
 			http_proxy_router.HttpsServerRun()
 		}()
+		go func() {
+			tcp_proxy_router.TcpServerRun()
+		}()
 		fmt.Println("start server")
 		quit := make(chan os.Signal)
 		signal.Notify(quit, syscall.SIGINT, syscall.SIGTERM)
 		<-quit
 		fmt.Println("server stopping")
+		tcp_proxy_router.TcpServerStop()
 		http_proxy_router.HttpServerStop()
 		http_proxy_router.HttpsServerStop()
+
 	}
 
 }
