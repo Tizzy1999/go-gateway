@@ -45,7 +45,7 @@ func (admininfo *AdminController) AdminInfo(c *gin.Context) {
 		ID:           adminSessionInfo.ID,
 		UserName:     adminSessionInfo.UserName,
 		LoginTime:    adminSessionInfo.LoginTime,
-		Avatar:       "https://icons-for-free.com/download-icon-avatar-1320568024619304547_512.png",
+		Avatar:       "https://www.flaticon.com/svg/static/icons/svg/194/194938.svg",
 		Introduction: "This is administrator Tizzy",
 		Roles:        []string{"admin"},
 	}
