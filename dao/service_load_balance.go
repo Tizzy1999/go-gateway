@@ -96,6 +96,7 @@ func (lbr *LoadBalancer) GetLoadBalancer(service *ServiceDetail) (load_balance.L
 	}
 	// 得到ip列表和权重列表
 	ipList := service.LoadBalance.GetIPListByModel()
+	//fmt.Println("ipList: ",ipList)
 	weightList := service.LoadBalance.GetWeightListByModel()
 	ipConf := map[string]string{}
 	for ipIndex, ipItem := range ipList {

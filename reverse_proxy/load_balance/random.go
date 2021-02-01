@@ -2,7 +2,6 @@ package load_balance
 
 import (
 	"errors"
-	"fmt"
 	"math/rand"
 	"strings"
 )
@@ -27,6 +26,7 @@ func (r *RandomBalance) Next() string {
 	if len(r.rss) == 0 {
 		return ""
 	}
+	//generate a random number within range
 	r.curIndex = rand.Intn(len(r.rss))
 	return r.rss[r.curIndex]
 }
@@ -48,7 +48,7 @@ func (r *RandomBalance) Update() {
 	//	}
 	//}
 	if conf, ok := r.conf.(*LoadBalanceCheckConf); ok {
-		fmt.Println("Update get check conf:", conf.GetConf())
+		//fmt.Println("Random Rb get check conf:", conf.GetConf())
 		r.rss = nil
 		for _, ip := range conf.GetConf() {
 			r.Add(strings.Split(ip, ",")...)

@@ -119,7 +119,6 @@ func (s *ServiceManager) LoadOnce() error {
 			return
 		}
 		for _, listItem := range list {
-
 			tmpItem := listItem
 			serviceDetail, err := tmpItem.ServiceDetail(c, tx, &tmpItem)
 			//serviceDetail, err := listItem.ServiceDetail(c, tx, &listItem)

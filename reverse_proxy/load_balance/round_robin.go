@@ -25,11 +25,12 @@ func (r *RoundRobinBalance) Next() string {
 	if len(r.rss) == 0 {
 		return ""
 	}
-	lens := len(r.rss) //5
+	lens := len(r.rss)
 	if r.curIndex >= lens {
 		r.curIndex = 0
 	}
 	curAddr := r.rss[r.curIndex]
+	// move to the following available node
 	r.curIndex = (r.curIndex + 1) % lens
 	return curAddr
 }

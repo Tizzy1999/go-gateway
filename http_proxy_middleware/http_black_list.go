@@ -21,15 +21,15 @@ func HTTPBlackListMiddleware() gin.HandlerFunc {
 		}
 		serviceDetail := serviceInterface.(*dao.ServiceDetail)
 		//因为白名单优先于黑名单，所以只有白名单为空的情况才考虑黑名单
-		whiteIpList := []string{}
-		if serviceDetail.AccessControl.WhiteList != "" {
-			whiteIpList = strings.Split(serviceDetail.AccessControl.WhiteList, ",")
-		}
+		//whiteIpList := []string{}
+		//if serviceDetail.AccessControl.WhiteList != "" {
+		//	whiteIpList = strings.Split(serviceDetail.AccessControl.WhiteList, ",")
+		//}
 		blackIpList := []string{}
 		if serviceDetail.AccessControl.BlackList != "" {
 			blackIpList = strings.Split(serviceDetail.AccessControl.BlackList, ",")
 		}
-		if serviceDetail.AccessControl.OpenAuth == 1 && len(whiteIpList) == 0 && len(blackIpList) > 0 {
+		if serviceDetail.AccessControl.OpenAuth == 1 && len(blackIpList) > 0 {
 			if public.InStringSlice(blackIpList, c.ClientIP()) {
 				middleware.ResponseError(c, 3001, errors.New(fmt.Sprintf("%s in black ip List", c.ClientIP())))
 				c.Abort()

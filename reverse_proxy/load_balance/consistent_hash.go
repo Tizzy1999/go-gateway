@@ -62,13 +62,13 @@ func (c *ConsistentHashBanlance) Add(params ...string) error {
 	addr := params[0]
 	c.mux.Lock()
 	defer c.mux.Unlock()
-	// 结合复制因子计算所有虚拟节点的hash值，并存入m.keys中，同时在m.hashMap中保存哈希值和key的映射
+	//compute hash values of all nodes, and store key-value pairs to a hashMap
 	for i := 0; i < c.replicas; i++ {
 		hash := c.hash([]byte(strconv.Itoa(i) + addr))
 		c.keys = append(c.keys, hash)
 		c.hashMap[hash] = addr
 	}
-	// 对所有虚拟节点的哈希值进行排序，方便之后进行二分查找
+	// sort the hash values for binary search
 	sort.Sort(c.keys)
 	return nil
 }
@@ -98,7 +98,7 @@ func (c *ConsistentHashBanlance) SetConf(conf LoadBalanceConf) {
 
 func (c *ConsistentHashBanlance) Update() {
 	if conf, ok := c.conf.(*LoadBalanceCheckConf); ok {
-		//fmt.Println("Update get check conf:", conf.GetConf())
+		//fmt.Println("IP hash get check conf:", conf.GetConf())
 		c.keys = nil
 		c.hashMap = map[uint32]string{}
 		//fmt.Println("conf.GetConf()", conf.GetConf())

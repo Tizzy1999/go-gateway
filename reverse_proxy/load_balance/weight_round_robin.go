@@ -2,7 +2,6 @@ package load_balance
 
 import (
 	"errors"
-	"fmt"
 	"strconv"
 	"strings"
 )
@@ -41,17 +40,15 @@ func (r *WeightRoundRobinBalance) Next() string {
 	var best *WeightNode
 	for i := 0; i < len(r.rss); i++ {
 		w := r.rss[i]
-		//step 1 统计所有有效权重之和
+		//step 1 sum the total of effective weights
 		total += w.effectiveWeight
-
-		//step 2 变更节点临时权重为的节点临时权重+节点有效权重
+		//step 2 update current weight by adding effective weight
 		w.currentWeight += w.effectiveWeight
-
-		//step 3 有效权重默认与权重相同，通讯异常时-1, 通讯成功+1，直到恢复到weight大小
+		//step 3 recover effective weight
 		if w.effectiveWeight < w.weight {
 			w.effectiveWeight++
 		}
-		//step 4 选择最大临时权重点节点
+		//step 4 select maximum current weight
 		if best == nil || w.currentWeight > best.currentWeight {
 			best = w
 		}
@@ -59,7 +56,7 @@ func (r *WeightRoundRobinBalance) Next() string {
 	if best == nil {
 		return ""
 	}
-	//step 5 变更临时权重为 临时权重-有效权重之和
+	//step 5 update current weight by subtracting total effective weights
 	best.currentWeight -= total
 	return best.addr
 }
@@ -81,7 +78,7 @@ func (r *WeightRoundRobinBalance) Update() {
 	//	}
 	//}
 	if conf, ok := r.conf.(*LoadBalanceCheckConf); ok {
-		fmt.Println("WeightRoundRobinBalance get check conf:", conf.GetConf())
+		//fmt.Println("WeightRoundRobinBalance get check conf:", conf.GetConf())
 		r.rss = nil
 		for _, ip := range conf.GetConf() {
 			r.Add(strings.Split(ip, ",")...)

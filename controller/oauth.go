@@ -22,9 +22,9 @@ func OAuthRegister(group *gin.RouterGroup) {
 }
 
 // Tokens godoc
-// @Summary 获取TOKEN
-// @Description 获取TOKEN
-// @Tags OAUTH
+// @Summary acquire token
+// @Description acquire token
+// @Tags OAuth
 // @ID /oauth/tokens
 // @Accept  json
 // @Produce  json

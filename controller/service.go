@@ -33,9 +33,9 @@ func ServiceRegister(group *gin.RouterGroup) {
 }
 
 // Service godoc
-// @Summary 服务列表
-// @Description 服务列表
-// @Tags 服务管理
+// @Summary list of services
+// @Description list of services
+// @Tags Service Management
 // @ID /service/service_list
 // @Accept  json
 // @Produce  json
@@ -128,9 +128,9 @@ func (service *ServiceController) ServiceList(c *gin.Context) {
 }
 
 // ServiceDetail godoc
-// @Summary 服务详情
-// @Description 服务详情
-// @Tags 服务管理
+// @Summary service details
+// @Description service details
+// @Tags Service Management
 // @ID /service/service_detail
 // @Accept  json
 // @Produce  json
@@ -166,9 +166,9 @@ func (service *ServiceController) ServiceDetail(c *gin.Context) {
 }
 
 // ServiceStat godoc
-// @Summary 服务统计
-// @Description 服务统计
-// @Tags 服务管理
+// @Summary service metrics
+// @Description service metrics
+// @Tags Service Management
 // @ID /service/service_stat
 // @Accept  json
 // @Produce  json
@@ -222,9 +222,9 @@ func (service *ServiceController) ServiceStat(c *gin.Context) {
 }
 
 // ServiceDelete godoc
-// @Summary 服务删除
-// @Description 服务删除
-// @Tags 服务管理
+// @Summary delete a service
+// @Description delete a service
+// @Tags Service Management
 // @ID /service/service_delete
 // @Accept  json
 // @Produce  json
@@ -258,9 +258,9 @@ func (service *ServiceController) ServiceDelete(c *gin.Context) {
 }
 
 // ServiceAddHTTP godoc
-// @Summary 添加HTTP服务
-// @Description 添加HTTP服务
-// @Tags 服务管理
+// @Summary add HTTP service
+// @Description add HTTP service
+// @Tags Service Management
 // @ID /service/service_add_http
 // @Accept  json
 // @Produce  json
@@ -359,9 +359,9 @@ func (service *ServiceController) ServiceAddHTTP(c *gin.Context) {
 }
 
 // ServiceUpdateHTTP godoc
-// @Summary 修改HTTP服务
-// @Description 修改HTTP服务
-// @Tags 服务管理
+// @Summary update HTTP service
+// @Description update HTTP service
+// @Tags Service Management
 // @ID /service/service_update_http
 // @Accept  json
 // @Produce  json
@@ -454,9 +454,9 @@ func (service *ServiceController) ServiceUpdateHTTP(c *gin.Context) {
 }
 
 // ServiceAddTcp godoc
-// @Summary tcp服务添加
-// @Description tcp服务添加
-// @Tags 服务管理
+// @Summary add TCP service
+// @Description add TCP service
+// @Tags Service Management
 // @ID /service/service_add_tcp
 // @Accept  json
 // @Produce  json
@@ -544,9 +544,9 @@ func (admin *ServiceController) ServiceAddTcp(c *gin.Context) {
 }
 
 // ServiceUpdateTcp godoc
-// @Summary tcp服务更新
-// @Description tcp服务更新
-// @Tags 服务管理
+// @Summary update TCP service
+// @Description update TCP service
+// @Tags Service Management
 // @ID /service/service_update_tcp
 // @Accept  json
 // @Produce  json
@@ -629,9 +629,9 @@ func (admin *ServiceController) ServiceUpdateTcp(c *gin.Context) {
 }
 
 // ServiceAddGrpc godoc
-// @Summary grpc服务添加
-// @Description grpc服务添加
-// @Tags 服务管理
+// @Summary add gRPC service
+// @Description add gRPC service
+// @Tags Service Management
 // @ID /service/service_add_grpc
 // @Accept  json
 // @Produce  json
@@ -720,9 +720,9 @@ func (admin *ServiceController) ServiceAddGrpc(c *gin.Context) {
 }
 
 // ServiceUpdateTcp godoc
-// @Summary grpc服务更新
-// @Description grpc服务更新
-// @Tags 服务管理
+// @Summary update gRPC service
+// @Description update gRPC service
+// @Tags Service Management
 // @ID /service/service_update_grpc
 // @Accept  json
 // @Produce  json

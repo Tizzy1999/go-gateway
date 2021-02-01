@@ -22,7 +22,7 @@ func GenSaltPassword(salt, password string) string {
 	return fmt.Sprintf("%x", s2.Sum(nil))
 }
 
-//MD5 md5加密
+//MD5 hash function
 func MD5(s string) string {
 	h := md5.New()
 	io.WriteString(h, s)

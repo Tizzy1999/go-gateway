@@ -23,9 +23,9 @@ func AdminLoginRegister(group *gin.RouterGroup) {
 }
 
 // AdminLogin godoc
-// @Summary 管理员登陆
-// @Description 管理员登陆
-// @Tags 管理员接口
+// @Summary admin login
+// @Description admin login
+// @Tags Admin
 // @ID /admin_login/login
 // @Accept  json
 // @Produce  json
@@ -80,9 +80,9 @@ func (adminlogin *AdminLoginController) AdminLogin(c *gin.Context) {
 }
 
 // AdminLogout godoc
-// @Summary 管理员退出
-// @Description 管理员退出
-// @Tags 管理员接口
+// @Summary admin logout
+// @Description admin logout
+// @Tags Admin
 // @ID /admin_login/logout
 // @Accept  json
 // @Produce  json

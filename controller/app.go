@@ -26,9 +26,9 @@ type APPController struct {
 }
 
 // APPList godoc
-// @Summary 租户列表
-// @Description 租户列表
-// @Tags 租户管理
+// @Summary list of tenants
+// @Description list of tenants
+// @Tags Tenant Management
 // @ID /app/app_list
 // @Accept  json
 // @Produce  json
@@ -80,9 +80,9 @@ func (admin *APPController) APPList(c *gin.Context) {
 }
 
 // APPDetail godoc
-// @Summary 租户详情
-// @Description 租户详情
-// @Tags 租户管理
+// @Summary tenant details
+// @Description tenant details
+// @Tags Tenant Management
 // @ID /app/app_detail
 // @Accept  json
 // @Produce  json
@@ -109,9 +109,9 @@ func (admin *APPController) APPDetail(c *gin.Context) {
 }
 
 // APPDelete godoc
-// @Summary 租户删除
-// @Description 租户删除
-// @Tags 租户管理
+// @Summary delete a tenant
+// @Description delete a tenant
+// @Tags Tenant Management
 // @ID /app/app_delete
 // @Accept  json
 // @Produce  json
@@ -142,9 +142,9 @@ func (admin *APPController) APPDelete(c *gin.Context) {
 }
 
 // AppAdd godoc
-// @Summary 租户添加
-// @Description 租户添加
-// @Tags 租户管理
+// @Summary add a tenant
+// @Description add a tenant
+// @Tags Tenant Management
 // @ID /app/app_add
 // @Accept  json
 // @Produce  json
@@ -188,9 +188,9 @@ func (admin *APPController) AppAdd(c *gin.Context) {
 }
 
 // AppUpdate godoc
-// @Summary 租户更新
-// @Description 租户更新
-// @Tags 租户管理
+// @Summary update tenant information
+// @Description update tenant information
+// @Tags Tenant Management
 // @ID /app/app_update
 // @Accept  json
 // @Produce  json
@@ -229,9 +229,9 @@ func (admin *APPController) AppUpdate(c *gin.Context) {
 }
 
 // AppStatistics godoc
-// @Summary 租户统计
-// @Description 租户统计
-// @Tags 租户管理
+// @Summary tenant statistics
+// @Description tenant statistics
+// @Tags Tenant Management
 // @ID /app/app_stat
 // @Accept  json
 // @Produce  json
@@ -254,7 +254,6 @@ func (admin *APPController) AppStatistics(c *gin.Context) {
 		return
 	}
 
-
 	counter, err := public.FlowCounterHandler.GetCounter(public.FlowAppPrefix + detail.AppID)
 	if err != nil {
 		middleware.ResponseError(c, 2003, err)
@@ -263,19 +262,19 @@ func (admin *APPController) AppStatistics(c *gin.Context) {
 	}
 	//今日流量全天小时级访问统计
 	todayStat := []int64{}
-	currentTime:= time.Now()
+	currentTime := time.Now()
 	for i := 0; i <= time.Now().In(lib.TimeLocation).Hour(); i++ {
-		dateTime:=time.Date(currentTime.Year(),currentTime.Month(),currentTime.Day(),i,0,0,0,lib.TimeLocation)
-		hourData,_:=counter.GetHourData(dateTime)
+		dateTime := time.Date(currentTime.Year(), currentTime.Month(), currentTime.Day(), i, 0, 0, 0, lib.TimeLocation)
+		hourData, _ := counter.GetHourData(dateTime)
 		todayStat = append(todayStat, hourData)
 	}
 
 	//昨日流量全天小时级访问统计
 	yesterdayStat := []int64{}
-	yesterTime:= currentTime.Add(-1*time.Duration(time.Hour*24))
+	yesterTime := currentTime.Add(-1 * time.Duration(time.Hour*24))
 	for i := 0; i <= 23; i++ {
-		dateTime:=time.Date(yesterTime.Year(),yesterTime.Month(),yesterTime.Day(),i,0,0,0,lib.TimeLocation)
-		hourData,_:=counter.GetHourData(dateTime)
+		dateTime := time.Date(yesterTime.Year(), yesterTime.Month(), yesterTime.Day(), i, 0, 0, 0, lib.TimeLocation)
+		hourData, _ := counter.GetHourData(dateTime)
 		yesterdayStat = append(yesterdayStat, hourData)
 	}
 	stat := dto.StatisticsOutput{

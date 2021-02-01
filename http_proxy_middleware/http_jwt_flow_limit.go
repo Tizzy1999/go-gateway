@@ -14,8 +14,7 @@ func HTTPJwtFlowLimitMiddleware() gin.HandlerFunc {
 	return func(c *gin.Context) {
 		appInterface, ok := c.Get("app")
 		if !ok {
-			middleware.ResponseError(c, 2001, errors.New("app not found"))
-			c.Abort()
+			c.Next()
 			return
 		}
 		appInfo := appInterface.(*dao.App)

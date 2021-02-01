@@ -110,7 +110,7 @@ definitions:
         $ref: '#/definitions/dao.GrpcRule'
       http_rule:
         $ref: '#/definitions/dao.HttpRule'
-      id:
+      info:
         $ref: '#/definitions/dao.ServiceInfo'
       load_balance:
         $ref: '#/definitions/dao.LoadBalance'
@@ -258,13 +258,13 @@ definitions:
     type: object
   dto.DashServiceStatOutput:
     properties:
-      data:
-        items:
-          $ref: '#/definitions/dto.DashServiceStatItemOutput'
-        type: array
       legend:
         items:
           type: string
+        type: array
+      series:
+        items:
+          $ref: '#/definitions/dto.DashServiceStatItemOutput'
         type: array
     type: object
   dto.PanelGroupDataOutput:
@@ -634,6 +634,47 @@ definitions:
     - service_name
     - weight_list
     type: object
+  dto.StatisticsOutput:
+    properties:
+      today:
+        items:
+          type: integer
+        type: array
+      yesterday:
+        items:
+          type: integer
+        type: array
+    required:
+    - today
+    - yesterday
+    type: object
+  dto.TokensInput:
+    properties:
+      grant_type:
+        example: client_credentials
+        type: string
+      scope:
+        example: read_write
+        type: string
+    required:
+    - grant_type
+    - scope
+    type: object
+  dto.TokensOutput:
+    properties:
+      access_token:
+        description: access_token
+        type: string
+      expires_in:
+        description: expires_in
+        type: integer
+      scope:
+        description: scope
+        type: string
+      token_type:
+        description: token_type
+        type: string
+    type: object
   middleware.Response:
     properties:
       data:
@@ -654,7 +695,7 @@ paths:
     get:
       consumes:
       - application/json
-      description: 管理员信息
+      description: admin information
       operationId: /admin/admin_info
       produces:
       - application/json
@@ -668,14 +709,14 @@ paths:
                 data:
                   $ref: '#/definitions/dto.AdminLoginOutput'
               type: object
-      summary: 管理员信息
+      summary: admin information
       tags:
-      - 管理员接口
+      - Admin
   /admin/change_pwd:
     post:
       consumes:
       - application/json
-      description: 修改密码
+      description: change password
       operationId: /admin/change_pwd
       parameters:
       - description: body
@@ -696,14 +737,14 @@ paths:
                 data:
                   type: string
               type: object
-      summary: 修改密码
+      summary: change password
       tags:
-      - 管理员接口
+      - Admin
   /admin_login/login:
     post:
       consumes:
       - application/json
-      description: 管理员登陆
+      description: admin login
       operationId: /admin_login/login
       parameters:
       - description: body
@@ -724,14 +765,14 @@ paths:
                 data:
                   $ref: '#/definitions/dto.AdminLoginOutput'
               type: object
-      summary: 管理员登陆
+      summary: admin login
       tags:
-      - 管理员接口
+      - Admin
   /admin_login/logout:
     get:
       consumes:
       - application/json
-      description: 管理员退出
+      description: admin logout
       operationId: /admin_login/logout
       produces:
       - application/json
@@ -745,14 +786,14 @@ paths:
                 data:
                   type: string
               type: object
-      summary: 管理员退出
+      summary: admin logout
       tags:
-      - 管理员接口
+      - Admin
   /app/app_add:
     post:
       consumes:
       - application/json
-      description: 租户添加
+      description: add a tenant
       operationId: /app/app_add
       parameters:
       - description: body
@@ -773,14 +814,14 @@ paths:
                 data:
                   type: string
               type: object
-      summary: 租户添加
+      summary: add a tenant
       tags:
-      - 租户管理
+      - Tenant Management
   /app/app_delete:
     get:
       consumes:
       - application/json
-      description: 租户删除
+      description: delete a tenant
       operationId: /app/app_delete
       parameters:
       - description: 租户ID
@@ -800,14 +841,14 @@ paths:
                 data:
                   type: string
               type: object
-      summary: 租户删除
+      summary: delete a tenant
       tags:
-      - 租户管理
+      - Tenant Management
   /app/app_detail:
     get:
       consumes:
       - application/json
-      description: 租户详情
+      description: tenant details
       operationId: /app/app_detail
       parameters:
       - description: 租户ID
@@ -827,14 +868,14 @@ paths:
                 data:
                   $ref: '#/definitions/dao.App'
               type: object
-      summary: 租户详情
+      summary: tenant details
       tags:
-      - 租户管理
+      - Tenant Management
   /app/app_list:
     get:
       consumes:
       - application/json
-      description: 租户列表
+      description: list of tenants
       operationId: /app/app_list
       parameters:
       - description: 关键词
@@ -863,14 +904,41 @@ paths:
                 data:
                   $ref: '#/definitions/dto.APPListOutput'
               type: object
-      summary: 租户列表
+      summary: list of tenants
       tags:
-      - 租户管理
+      - Tenant Management
+  /app/app_stat:
+    get:
+      consumes:
+      - application/json
+      description: tenant statistics
+      operationId: /app/app_stat
+      parameters:
+      - description: 租户ID
+        in: query
+        name: id
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: success
+          schema:
+            allOf:
+            - $ref: '#/definitions/middleware.Response'
+            - properties:
+                data:
+                  $ref: '#/definitions/dto.StatisticsOutput'
+              type: object
+      summary: tenant statistics
+      tags:
+      - Tenant Management
   /app/app_update:
     post:
       consumes:
       - application/json
-      description: 租户更新
+      description: update tenant information
       operationId: /app/app_update
       parameters:
       - description: body
@@ -891,14 +959,14 @@ paths:
                 data:
                   type: string
               type: object
-      summary: 租户更新
+      summary: update tenant information
       tags:
-      - 租户管理
+      - Tenant Management
   /dashboard/flow_stat:
     get:
       consumes:
       - application/json
-      description: 服务统计
+      description: service flow data
       operationId: /dashboard/flow_stat
       produces:
       - application/json
@@ -912,14 +980,14 @@ paths:
                 data:
                   $ref: '#/definitions/dto.ServiceStatOutput'
               type: object
-      summary: 服务统计
+      summary: service flow data
       tags:
-      - 首页大盘
+      - Dashboard
   /dashboard/panel_group_data:
     get:
       consumes:
       - application/json
-      description: 指标统计
+      description: panel group data
       operationId: /dashboard/panel_group_data
       produces:
       - application/json
@@ -933,14 +1001,14 @@ paths:
                 data:
                   $ref: '#/definitions/dto.PanelGroupDataOutput'
               type: object
-      summary: 指标统计
+      summary: panel group data
       tags:
-      - 首页大盘
+      - Dashboard
   /dashboard/service_stat:
     get:
       consumes:
       - application/json
-      description: 服务统计
+      description: service percentage
       operationId: /dashboard/service_stat
       produces:
       - application/json
@@ -954,14 +1022,42 @@ paths:
                 data:
                   $ref: '#/definitions/dto.DashServiceStatOutput'
               type: object
-      summary: 服务统计
+      summary: service percentage
       tags:
-      - 首页大盘
+      - Dashboard
+  /oauth/tokens:
+    post:
+      consumes:
+      - application/json
+      description: acquire token
+      operationId: /oauth/tokens
+      parameters:
+      - description: body
+        in: body
+        name: body
+        required: true
+        schema:
+          $ref: '#/definitions/dto.TokensInput'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: success
+          schema:
+            allOf:
+            - $ref: '#/definitions/middleware.Response'
+            - properties:
+                data:
+                  $ref: '#/definitions/dto.TokensOutput'
+              type: object
+      summary: acquire token
+      tags:
+      - OAuth
   /service/service_add_grpc:
     post:
       consumes:
       - application/json
-      description: grpc服务添加
+      description: add gRPC service
       operationId: /service/service_add_grpc
       parameters:
       - description: body
@@ -982,14 +1078,14 @@ paths:
                 data:
                   type: string
               type: object
-      summary: grpc服务添加
+      summary: add gRPC service
       tags:
-      - 服务管理
+      - Service Management
   /service/service_add_http:
     post:
       consumes:
       - application/json
-      description: 添加HTTP服务
+      description: add HTTP service
       operationId: /service/service_add_http
       parameters:
       - description: body
@@ -1010,14 +1106,14 @@ paths:
                 data:
                   type: string
               type: object
-      summary: 添加HTTP服务
+      summary: add HTTP service
       tags:
-      - 服务管理
+      - Service Management
   /service/service_add_tcp:
     post:
       consumes:
       - application/json
-      description: tcp服务添加
+      description: add TCP service
       operationId: /service/service_add_tcp
       parameters:
       - description: body
@@ -1038,14 +1134,14 @@ paths:
                 data:
                   type: string
               type: object
-      summary: tcp服务添加
+      summary: add TCP service
       tags:
-      - 服务管理
+      - Service Management
   /service/service_delete:
     get:
       consumes:
       - application/json
-      description: 服务删除
+      description: delete a service
       operationId: /service/service_delete
       parameters:
       - description: 服务ID
@@ -1065,14 +1161,14 @@ paths:
                 data:
                   type: string
               type: object
-      summary: 服务删除
+      summary: delete a service
       tags:
-      - 服务管理
+      - Service Management
   /service/service_detail:
     get:
       consumes:
       - application/json
-      description: 服务详情
+      description: service details
       operationId: /service/service_detail
       parameters:
       - description: 服务ID
@@ -1092,14 +1188,14 @@ paths:
                 data:
                   $ref: '#/definitions/dao.ServiceDetail'
               type: object
-      summary: 服务详情
+      summary: service details
       tags:
-      - 服务管理
+      - Service Management
   /service/service_list:
     get:
       consumes:
       - application/json
-      description: 服务列表
+      description: list of services
       operationId: /service/service_list
       parameters:
       - description: 关键词
@@ -1128,14 +1224,14 @@ paths:
                 data:
                   $ref: '#/definitions/dto.ServiceListOutput'
               type: object
-      summary: 服务列表
+      summary: list of services
       tags:
-      - 服务管理
+      - Service Management
   /service/service_stat:
     get:
       consumes:
       - application/json
-      description: 服务统计
+      description: service metrics
       operationId: /service/service_stat
       parameters:
       - description: 服务ID
@@ -1155,14 +1251,14 @@ paths:
                 data:
                   $ref: '#/definitions/dto.ServiceStatOutput'
               type: object
-      summary: 服务统计
+      summary: service metrics
       tags:
-      - 服务管理
+      - Service Management
   /service/service_update_grpc:
     post:
       consumes:
       - application/json
-      description: grpc服务更新
+      description: update gRPC service
       operationId: /service/service_update_grpc
       parameters:
       - description: body
@@ -1183,14 +1279,14 @@ paths:
                 data:
                   type: string
               type: object
-      summary: grpc服务更新
+      summary: update gRPC service
       tags:
-      - 服务管理
+      - Service Management
   /service/service_update_http:
     post:
       consumes:
       - application/json
-      description: 修改HTTP服务
+      description: update HTTP service
       operationId: /service/service_update_http
       parameters:
       - description: body
@@ -1211,14 +1307,14 @@ paths:
                 data:
                   type: string
               type: object
-      summary: 修改HTTP服务
+      summary: update HTTP service
       tags:
-      - 服务管理
+      - Service Management
   /service/service_update_tcp:
     post:
       consumes:
       - application/json
-      description: tcp服务更新
+      description: update TCP service
       operationId: /service/service_update_tcp
       parameters:
       - description: body
@@ -1239,7 +1335,7 @@ paths:
                 data:
                   type: string
               type: object
-      summary: tcp服务更新
+      summary: update TCP service
       tags:
-      - 服务管理
+      - Service Management
 swagger: "2.0"

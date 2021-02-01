@@ -23,9 +23,9 @@ func AdminRegister(group *gin.RouterGroup) {
 }
 
 // Admin godoc
-// @Summary 管理员信息
-// @Description 管理员信息
-// @Tags 管理员接口
+// @Summary admin information
+// @Description admin information
+// @Tags Admin
 // @ID /admin/admin_info
 // @Accept  json
 // @Produce  json
@@ -45,7 +45,7 @@ func (admininfo *AdminController) AdminInfo(c *gin.Context) {
 		ID:           adminSessionInfo.ID,
 		UserName:     adminSessionInfo.UserName,
 		LoginTime:    adminSessionInfo.LoginTime,
-		Avatar:       "https://www.flaticon.com/svg/static/icons/svg/194/194938.svg",
+		Avatar:       "https://drain1.ca/wp-content/uploads/2018/01/flat-faces-icons-circle-16.png",
 		Introduction: "This is administrator Tizzy",
 		Roles:        []string{"admin"},
 	}
@@ -53,9 +53,9 @@ func (admininfo *AdminController) AdminInfo(c *gin.Context) {
 }
 
 // ChangePwd godoc
-// @Summary 修改密码
-// @Description 修改密码
-// @Tags 管理员接口
+// @Summary change password
+// @Description change password
+// @Tags Admin
 // @ID /admin/change_pwd
 // @Accept  json
 // @Produce  json

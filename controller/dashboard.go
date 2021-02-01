@@ -21,9 +21,9 @@ func DashboardRegister(group *gin.RouterGroup) {
 }
 
 // PanelGroupData godoc
-// @Summary 指标统计
-// @Description 指标统计
-// @Tags 首页大盘
+// @Summary panel group data
+// @Description panel group data
+// @Tags Dashboard
 // @ID /dashboard/panel_group_data
 // @Accept  json
 // @Produce  json
@@ -65,9 +65,9 @@ func (service *DashboardController) PanelGroupData(c *gin.Context) {
 }
 
 // FlowStat godoc
-// @Summary 服务统计
-// @Description 服务统计
-// @Tags 首页大盘
+// @Summary service flow data
+// @Description service flow data
+// @Tags Dashboard
 // @ID /dashboard/flow_stat
 // @Accept  json
 // @Produce  json
@@ -100,9 +100,9 @@ func (service *DashboardController) FlowStat(c *gin.Context) {
 }
 
 // ServiceStat godoc
-// @Summary 服务统计
-// @Description 服务统计
-// @Tags 首页大盘
+// @Summary service percentage
+// @Description service percentage
+// @Tags Dashboard
 // @ID /dashboard/service_stat
 // @Accept  json
 // @Produce  json

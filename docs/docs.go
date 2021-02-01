@@ -26,7 +26,7 @@ var doc = `{
     "paths": {
         "/admin/admin_info": {
             "get": {
-                "description": "管理员信息",
+                "description": "admin information",
                 "consumes": [
                     "application/json"
                 ],
@@ -34,9 +34,9 @@ var doc = `{
                     "application/json"
                 ],
                 "tags": [
-                    "管理员接口"
+                    "Admin"
                 ],
-                "summary": "管理员信息",
+                "summary": "admin information",
                 "operationId": "/admin/admin_info",
                 "responses": {
                     "200": {
@@ -62,7 +62,7 @@ var doc = `{
         },
         "/admin/change_pwd": {
             "post": {
-                "description": "修改密码",
+                "description": "change password",
                 "consumes": [
                     "application/json"
                 ],
@@ -70,9 +70,9 @@ var doc = `{
                     "application/json"
                 ],
                 "tags": [
-                    "管理员接口"
+                    "Admin"
                 ],
-                "summary": "修改密码",
+                "summary": "change password",
                 "operationId": "/admin/change_pwd",
                 "parameters": [
                     {
@@ -109,7 +109,7 @@ var doc = `{
         },
         "/admin_login/login": {
             "post": {
-                "description": "管理员登陆",
+                "description": "admin login",
                 "consumes": [
                     "application/json"
                 ],
@@ -117,9 +117,9 @@ var doc = `{
                     "application/json"
                 ],
                 "tags": [
-                    "管理员接口"
+                    "Admin"
                 ],
-                "summary": "管理员登陆",
+                "summary": "admin login",
                 "operationId": "/admin_login/login",
                 "parameters": [
                     {
@@ -156,7 +156,7 @@ var doc = `{
         },
         "/admin_login/logout": {
             "get": {
-                "description": "管理员退出",
+                "description": "admin logout",
                 "consumes": [
                     "application/json"
                 ],
@@ -164,9 +164,9 @@ var doc = `{
                     "application/json"
                 ],
                 "tags": [
-                    "管理员接口"
+                    "Admin"
                 ],
-                "summary": "管理员退出",
+                "summary": "admin logout",
                 "operationId": "/admin_login/logout",
                 "responses": {
                     "200": {
@@ -192,7 +192,7 @@ var doc = `{
         },
         "/app/app_add": {
             "post": {
-                "description": "租户添加",
+                "description": "add a tenant",
                 "consumes": [
                     "application/json"
                 ],
@@ -200,9 +200,9 @@ var doc = `{
                     "application/json"
                 ],
                 "tags": [
-                    "租户管理"
+                    "Tenant Management"
                 ],
-                "summary": "租户添加",
+                "summary": "add a tenant",
                 "operationId": "/app/app_add",
                 "parameters": [
                     {
@@ -239,7 +239,7 @@ var doc = `{
         },
         "/app/app_delete": {
             "get": {
-                "description": "租户删除",
+                "description": "delete a tenant",
                 "consumes": [
                     "application/json"
                 ],
@@ -247,9 +247,9 @@ var doc = `{
                     "application/json"
                 ],
                 "tags": [
-                    "租户管理"
+                    "Tenant Management"
                 ],
-                "summary": "租户删除",
+                "summary": "delete a tenant",
                 "operationId": "/app/app_delete",
                 "parameters": [
                     {
@@ -284,7 +284,7 @@ var doc = `{
         },
         "/app/app_detail": {
             "get": {
-                "description": "租户详情",
+                "description": "tenant details",
                 "consumes": [
                     "application/json"
                 ],
@@ -292,9 +292,9 @@ var doc = `{
                     "application/json"
                 ],
                 "tags": [
-                    "租户管理"
+                    "Tenant Management"
                 ],
-                "summary": "租户详情",
+                "summary": "tenant details",
                 "operationId": "/app/app_detail",
                 "parameters": [
                     {
@@ -329,7 +329,7 @@ var doc = `{
         },
         "/app/app_list": {
             "get": {
-                "description": "租户列表",
+                "description": "list of tenants",
                 "consumes": [
                     "application/json"
                 ],
@@ -337,9 +337,9 @@ var doc = `{
                     "application/json"
                 ],
                 "tags": [
-                    "租户管理"
+                    "Tenant Management"
                 ],
-                "summary": "租户列表",
+                "summary": "list of tenants",
                 "operationId": "/app/app_list",
                 "parameters": [
                     {
@@ -385,9 +385,9 @@ var doc = `{
                 }
             }
         },
-        "/app/app_update": {
-            "post": {
-                "description": "租户更新",
+        "/app/app_stat": {
+            "get": {
+                "description": "tenant statistics",
                 "consumes": [
                     "application/json"
                 ],
@@ -395,9 +395,54 @@ var doc = `{
                     "application/json"
                 ],
                 "tags": [
-                    "租户管理"
+                    "Tenant Management"
                 ],
-                "summary": "租户更新",
+                "summary": "tenant statistics",
+                "operationId": "/app/app_stat",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "租户ID",
+                        "name": "id",
+                        "in": "query",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "success",
+                        "schema": {
+                            "allOf": [
+                                {
+                                    "$ref": "#/definitions/middleware.Response"
+                                },
+                                {
+                                    "type": "object",
+                                    "properties": {
+                                        "data": {
+                                            "$ref": "#/definitions/dto.StatisticsOutput"
+                                        }
+                                    }
+                                }
+                            ]
+                        }
+                    }
+                }
+            }
+        },
+        "/app/app_update": {
+            "post": {
+                "description": "update tenant information",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Tenant Management"
+                ],
+                "summary": "update tenant information",
                 "operationId": "/app/app_update",
                 "parameters": [
                     {
@@ -434,7 +479,7 @@ var doc = `{
         },
         "/dashboard/flow_stat": {
             "get": {
-                "description": "服务统计",
+                "description": "service flow data",
                 "consumes": [
                     "application/json"
                 ],
@@ -442,9 +487,9 @@ var doc = `{
                     "application/json"
                 ],
                 "tags": [
-                    "首页大盘"
+                    "Dashboard"
                 ],
-                "summary": "服务统计",
+                "summary": "service flow data",
                 "operationId": "/dashboard/flow_stat",
                 "responses": {
                     "200": {
@@ -470,7 +515,7 @@ var doc = `{
         },
         "/dashboard/panel_group_data": {
             "get": {
-                "description": "指标统计",
+                "description": "panel group data",
                 "consumes": [
                     "application/json"
                 ],
@@ -478,9 +523,9 @@ var doc = `{
                     "application/json"
                 ],
                 "tags": [
-                    "首页大盘"
+                    "Dashboard"
                 ],
-                "summary": "指标统计",
+                "summary": "panel group data",
                 "operationId": "/dashboard/panel_group_data",
                 "responses": {
                     "200": {
@@ -506,7 +551,7 @@ var doc = `{
         },
         "/dashboard/service_stat": {
             "get": {
-                "description": "服务统计",
+                "description": "service percentage",
                 "consumes": [
                     "application/json"
                 ],
@@ -514,9 +559,9 @@ var doc = `{
                     "application/json"
                 ],
                 "tags": [
-                    "首页大盘"
+                    "Dashboard"
                 ],
-                "summary": "服务统计",
+                "summary": "service percentage",
                 "operationId": "/dashboard/service_stat",
                 "responses": {
                     "200": {
@@ -540,9 +585,9 @@ var doc = `{
                 }
             }
         },
-        "/service/service_add_grpc": {
+        "/oauth/tokens": {
             "post": {
-                "description": "grpc服务添加",
+                "description": "acquire token",
                 "consumes": [
                     "application/json"
                 ],
@@ -550,9 +595,56 @@ var doc = `{
                     "application/json"
                 ],
                 "tags": [
-                    "服务管理"
+                    "OAuth"
                 ],
-                "summary": "grpc服务添加",
+                "summary": "acquire token",
+                "operationId": "/oauth/tokens",
+                "parameters": [
+                    {
+                        "description": "body",
+                        "name": "body",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/dto.TokensInput"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "success",
+                        "schema": {
+                            "allOf": [
+                                {
+                                    "$ref": "#/definitions/middleware.Response"
+                                },
+                                {
+                                    "type": "object",
+                                    "properties": {
+                                        "data": {
+                                            "$ref": "#/definitions/dto.TokensOutput"
+                                        }
+                                    }
+                                }
+                            ]
+                        }
+                    }
+                }
+            }
+        },
+        "/service/service_add_grpc": {
+            "post": {
+                "description": "add gRPC service",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Service Management"
+                ],
+                "summary": "add gRPC service",
                 "operationId": "/service/service_add_grpc",
                 "parameters": [
                     {
@@ -589,7 +681,7 @@ var doc = `{
         },
         "/service/service_add_http": {
             "post": {
-                "description": "添加HTTP服务",
+                "description": "add HTTP service",
                 "consumes": [
                     "application/json"
                 ],
@@ -597,9 +689,9 @@ var doc = `{
                     "application/json"
                 ],
                 "tags": [
-                    "服务管理"
+                    "Service Management"
                 ],
-                "summary": "添加HTTP服务",
+                "summary": "add HTTP service",
                 "operationId": "/service/service_add_http",
                 "parameters": [
                     {
@@ -636,7 +728,7 @@ var doc = `{
         },
         "/service/service_add_tcp": {
             "post": {
-                "description": "tcp服务添加",
+                "description": "add TCP service",
                 "consumes": [
                     "application/json"
                 ],
@@ -644,9 +736,9 @@ var doc = `{
                     "application/json"
                 ],
                 "tags": [
-                    "服务管理"
+                    "Service Management"
                 ],
-                "summary": "tcp服务添加",
+                "summary": "add TCP service",
                 "operationId": "/service/service_add_tcp",
                 "parameters": [
                     {
@@ -683,7 +775,7 @@ var doc = `{
         },
         "/service/service_delete": {
             "get": {
-                "description": "服务删除",
+                "description": "delete a service",
                 "consumes": [
                     "application/json"
                 ],
@@ -691,9 +783,9 @@ var doc = `{
                     "application/json"
                 ],
                 "tags": [
-                    "服务管理"
+                    "Service Management"
                 ],
-                "summary": "服务删除",
+                "summary": "delete a service",
                 "operationId": "/service/service_delete",
                 "parameters": [
                     {
@@ -728,7 +820,7 @@ var doc = `{
         },
         "/service/service_detail": {
             "get": {
-                "description": "服务详情",
+                "description": "service details",
                 "consumes": [
                     "application/json"
                 ],
@@ -736,9 +828,9 @@ var doc = `{
                     "application/json"
                 ],
                 "tags": [
-                    "服务管理"
+                    "Service Management"
                 ],
-                "summary": "服务详情",
+                "summary": "service details",
                 "operationId": "/service/service_detail",
                 "parameters": [
                     {
@@ -773,7 +865,7 @@ var doc = `{
         },
         "/service/service_list": {
             "get": {
-                "description": "服务列表",
+                "description": "list of services",
                 "consumes": [
                     "application/json"
                 ],
@@ -781,9 +873,9 @@ var doc = `{
                     "application/json"
                 ],
                 "tags": [
-                    "服务管理"
+                    "Service Management"
                 ],
-                "summary": "服务列表",
+                "summary": "list of services",
                 "operationId": "/service/service_list",
                 "parameters": [
                     {
@@ -831,7 +923,7 @@ var doc = `{
         },
         "/service/service_stat": {
             "get": {
-                "description": "服务统计",
+                "description": "service metrics",
                 "consumes": [
                     "application/json"
                 ],
@@ -839,9 +931,9 @@ var doc = `{
                     "application/json"
                 ],
                 "tags": [
-                    "服务管理"
+                    "Service Management"
                 ],
-                "summary": "服务统计",
+                "summary": "service metrics",
                 "operationId": "/service/service_stat",
                 "parameters": [
                     {
@@ -876,7 +968,7 @@ var doc = `{
         },
         "/service/service_update_grpc": {
             "post": {
-                "description": "grpc服务更新",
+                "description": "update gRPC service",
                 "consumes": [
                     "application/json"
                 ],
@@ -884,9 +976,9 @@ var doc = `{
                     "application/json"
                 ],
                 "tags": [
-                    "服务管理"
+                    "Service Management"
                 ],
-                "summary": "grpc服务更新",
+                "summary": "update gRPC service",
                 "operationId": "/service/service_update_grpc",
                 "parameters": [
                     {
@@ -923,7 +1015,7 @@ var doc = `{
         },
         "/service/service_update_http": {
             "post": {
-                "description": "修改HTTP服务",
+                "description": "update HTTP service",
                 "consumes": [
                     "application/json"
                 ],
@@ -931,9 +1023,9 @@ var doc = `{
                     "application/json"
                 ],
                 "tags": [
-                    "服务管理"
+                    "Service Management"
                 ],
-                "summary": "修改HTTP服务",
+                "summary": "update HTTP service",
                 "operationId": "/service/service_update_http",
                 "parameters": [
                     {
@@ -970,7 +1062,7 @@ var doc = `{
         },
         "/service/service_update_tcp": {
             "post": {
-                "description": "tcp服务更新",
+                "description": "update TCP service",
                 "consumes": [
                     "application/json"
                 ],
@@ -978,9 +1070,9 @@ var doc = `{
                     "application/json"
                 ],
                 "tags": [
-                    "服务管理"
+                    "Service Management"
                 ],
-                "summary": "tcp服务更新",
+                "summary": "update TCP service",
                 "operationId": "/service/service_update_tcp",
                 "parameters": [
                     {
@@ -1186,7 +1278,7 @@ var doc = `{
                 "http_rule": {
                     "$ref": "#/definitions/dao.HttpRule"
                 },
-                "id": {
+                "info": {
                     "$ref": "#/definitions/dao.ServiceInfo"
                 },
                 "load_balance": {
@@ -1406,16 +1498,16 @@ var doc = `{
         "dto.DashServiceStatOutput": {
             "type": "object",
             "properties": {
-                "data": {
-                    "type": "array",
-                    "items": {
-                        "$ref": "#/definitions/dto.DashServiceStatItemOutput"
-                    }
-                },
                 "legend": {
                     "type": "array",
                     "items": {
                         "type": "string"
+                    }
+                },
+                "series": {
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/definitions/dto.DashServiceStatItemOutput"
                     }
                 }
             }
@@ -1928,6 +2020,65 @@ var doc = `{
                     "type": "string"
                 },
                 "white_list": {
+                    "type": "string"
+                }
+            }
+        },
+        "dto.StatisticsOutput": {
+            "type": "object",
+            "required": [
+                "today",
+                "yesterday"
+            ],
+            "properties": {
+                "today": {
+                    "type": "array",
+                    "items": {
+                        "type": "integer"
+                    }
+                },
+                "yesterday": {
+                    "type": "array",
+                    "items": {
+                        "type": "integer"
+                    }
+                }
+            }
+        },
+        "dto.TokensInput": {
+            "type": "object",
+            "required": [
+                "grant_type",
+                "scope"
+            ],
+            "properties": {
+                "grant_type": {
+                    "type": "string",
+                    "example": "client_credentials"
+                },
+                "scope": {
+                    "type": "string",
+                    "example": "read_write"
+                }
+            }
+        },
+        "dto.TokensOutput": {
+            "type": "object",
+            "properties": {
+                "access_token": {
+                    "description": "access_token",
+                    "type": "string"
+                },
+                "expires_in": {
+                    "description": "expires_in",
+                    "type": "integer"
+                },
+                "scope": {
+                    "description": "scope",
+                    "type": "string"
+                },
+                "token_type": {
+                    "description": "token_type",
                     "type": "string"
                 }
             }

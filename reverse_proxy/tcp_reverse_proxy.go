@@ -64,7 +64,7 @@ func (dp *TcpReverseProxy) keepAlivePeriod() time.Duration {
 
 //传入上游 conn，在这里完成下游连接与数据交换
 func (dp *TcpReverseProxy) ServeTCP(ctx context.Context, src net.Conn) {
-	//设置连接超时
+	// check whether connection timeout
 	var cancel context.CancelFunc
 	if dp.DialTimeout >= 0 {
 		ctx, cancel = context.WithTimeout(ctx, dp.dialTimeout())
@@ -77,10 +77,10 @@ func (dp *TcpReverseProxy) ServeTCP(ctx context.Context, src net.Conn) {
 		dp.onDialError()(src, err)
 		return
 	}
+	//close downstream connection
+	defer func() { go dst.Close() }()
 
-	defer func() { go dst.Close() }() //记得退出下游连接
-
-	//设置dst的 keepAlive 参数,在数据请求之前
+	//set the keep-alive time for downstream connection before data transfer
 	if ka := dp.keepAlivePeriod(); ka > 0 {
 		if c, ok := dst.(*net.TCPConn); ok {
 			c.SetKeepAlive(true)
